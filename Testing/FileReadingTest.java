@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 
 public class FileReadingTest {
 
@@ -7,8 +8,9 @@ public class FileReadingTest {
      */
     public static void main(String[] args) {
         try {
-            // Initialise file writer
+            // Initialise variables
             FileWriter writer = new FileWriter("Data_Storage.txt");
+            ArrayList<Record> tableRecords = new ArrayList<>();
 
             // Write table headings in data storage file
             writeHeadings(writer);
@@ -37,20 +39,42 @@ public class FileReadingTest {
                         int minute = Integer.valueOf(fileName.substring(15, 17));
                         int second = Integer.valueOf(fileName.substring(17, 19));
 
+                        // Get other image information
+                        String imageID = fileName.substring(28, 31);
+                        String participantID = participants[i].getName();
+                        String activity = participantActivities[j].getName();
+
+                        // Add this image information to the table records
+                        Record record = new Record();
+                        record.imageID = imageID;
+                        record.participantID = participantID;
+                        record.day = day;
+                        record.month = month;
+                        record.year = year;
+                        record.hour = hour;
+                        record.minute = minute;
+                        record.second = second;
+                        record.activity = activity;
+                        tableRecords.add(record);
+
                         // Write all data in data storage file
-                        writeImageID(writer, fileName);
-                        writeParticipantID(writer, participants, i);
+                        writeImageID(writer, imageID);
+                        writeParticipantID(writer, participantID);
                         writeDay(writer, day);
                         writeMonth(writer, month);
                         writeYear(writer, year);
                         writeHour(writer, hour);
                         writeMinute(writer, minute);
                         writeSecond(writer, second);
-                        writeActivity(writer, participantActivities, j);
+                        writeActivity(writer, activity);
                     }
                 }
             }
             writer.close();
+
+            for (Record i : tableRecords) {
+                System.out.println(i.imageID + " " + i.participantID + " " + i.day + " " + i.month + " " + i.year + " " + i.hour + " " + i.minute + " " + i.second + " " + i.activity);
+            }
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -77,9 +101,9 @@ public class FileReadingTest {
     /*
      * This function writes the ImageID data in the data storage file
      */
-    public static void writeImageID(Writer writer, String fileName) {
+    public static void writeImageID(Writer writer, String imageID) {
         try {
-            writer.write("|" + fileName.substring(28, 31));
+            writer.write("|" + imageID);
             writer.write("       |");
         }
         catch (Exception e) {
@@ -90,9 +114,9 @@ public class FileReadingTest {
     /*
      * This function writes the ParticipantID data in the data storage file
      */
-    public static void writeParticipantID(Writer writer, File[] participants, int i) {
+    public static void writeParticipantID(Writer writer, String participantID) {
         try {
-            writer.write(participants[i].getName());
+            writer.write(participantID);
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -206,10 +230,10 @@ public class FileReadingTest {
     /*
      * This function writes the Activity data in the data storage file
      */
-    public static void writeActivity(Writer writer, File[] participantActivities, int j) {
+    public static void writeActivity(Writer writer, String activity) {
         try {
-            writer.write(participantActivities[j].getName());
-            for (int l = (16-(16-(participantActivities[j].getName().length()))); l < 16; l++) {
+            writer.write(activity);
+            for (int l = (16-(16-(activity.length()))); l < 16; l++) {
                 writer.write(" ");
             }
             writer.write("|\n");
