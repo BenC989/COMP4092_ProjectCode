@@ -19,18 +19,15 @@ public class FileReadingTest {
   
             // Iterate Participants folder (containing the participants)
             for (int i = 0; i < participants.length; i++) { 
-                //System.out.println(participants[i].getName()); 
 
                 // Iterate Participants -> Participant folder (containing the activities)
                 File[] participantActivities = participants[i].listFiles();
                 for (int j = 0; j < participantActivities.length; j++) {
-                    //System.out.println("        " + participantActivities[j].getName());
 
                     // Iterate Participants -> Participant -> Activity (containing the images)
                     File[] participantActivityImages = participantActivities[j].listFiles();
                     for (int k = 0; k < participantActivityImages.length; k++) {
                         String fileName = participantActivityImages[k].getName();
-                       // System.out.print("                " + fileName + " - ");
 
                         int year = Integer.valueOf(fileName.substring(4, 8));
                         int month = Integer.valueOf(fileName.substring(8, 10));
@@ -38,14 +35,18 @@ public class FileReadingTest {
                         int hour = Integer.valueOf(fileName.substring(13, 15));
                         int minute = Integer.valueOf(fileName.substring(15, 17));
                         int second = Integer.valueOf(fileName.substring(17, 19));
-                        /*System.out.print("Year: " + year + " ");
-                        System.out.print("Month: " + month + " ");
-                        System.out.print("Day: " + day + " ");
-                        System.out.print("Hour: " + hour + " ");
-                        System.out.print("Minute: " + minute + " ");
-                        System.out.print("Second: " + second + " ");
-                        System.out.println();*/
-                        writer.write("                            |" + year + "/");
+
+                        writer.write("|" + fileName.substring(28, 31));
+                        writer.write("       |");
+                        writer.write(participants[i].getName());
+                        writer.write("  |");
+                        if (day < 10) {
+                            writer.write("0" + day);
+                        }
+                        else {
+                            writer.write("" + day);
+                        }
+                        writer.write("/");
                         if (month < 10) {
                             writer.write("0" + month);
                         }
@@ -53,12 +54,7 @@ public class FileReadingTest {
                             writer.write("" + month);
                         }
                         writer.write("/");
-                        if (day < 10) {
-                            writer.write("0" + day);
-                        }
-                        else {
-                            writer.write("" + day);
-                        }
+                        writer.write("" + year);
                         writer.write("|");
                         if (hour < 10) {
                             writer.write("0" + hour);
@@ -82,7 +78,6 @@ public class FileReadingTest {
                         }
                         writer.write("|");
                         writer.write(participantActivities[j].getName());
-                        System.out.println((16-(participantActivities[j].getName().length())));
                         for (int l = (16-(16-(participantActivities[j].getName().length()))); l < 16; l++) {
                             writer.write(" ");
                         }
