@@ -19,7 +19,16 @@ public class FileReadingTest {
                     // Iterate Participants -> Participant -> Activity (containing the images)
                     File[] participantActivityImages = participantActivities[j].listFiles();
                     for (int k = 0; k < participantActivityImages.length; k++) {
-                        System.out.println("                " + participantActivityImages[k].getName());
+                        String fileName = participantActivityImages[k].getName();
+                        System.out.print("                " + fileName + " - ");
+
+                        System.out.print("Year: " + fileName.substring(4, 8) + " ");
+                        System.out.print("Month: " + fileName.substring(8, 10) + " ");
+                        System.out.print("Day: " + fileName.substring(10, 12) + " ");
+                        System.out.print("Hour: " + fileName.substring(13, 15) + " ");
+                        System.out.print("Minute: " + fileName.substring(15, 17) + " ");
+                        System.out.print("Second: " + fileName.substring(17, 19) + " ");
+                        System.out.println();
                     }
                 }
             } 
