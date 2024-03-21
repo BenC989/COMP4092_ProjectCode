@@ -72,9 +72,8 @@ public class FileReadingTest {
             }
             writer.close();
 
-            for (Record i : tableRecords) {
-                System.out.println(i.imageID + " " + i.participantID + " " + i.day + " " + i.month + " " + i.year + " " + i.hour + " " + i.minute + " " + i.second + " " + i.activity);
-            }
+            // Example call to participant activities function
+            participantActivities(participants[0].getName(), tableRecords);
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -241,5 +240,49 @@ public class FileReadingTest {
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
         }
+    }
+
+    /*
+     * This function considers one participant and calculates the time duration for each of their activities
+     */
+    public static ArrayList<Activity> participantActivities(String participant, ArrayList<Record> tableRecords) {
+        // Define variables
+        ArrayList<Activity> participantActivities = new ArrayList<>();
+        int index = 0;
+        boolean newActivity = true;
+        Activity activity = new Activity();
+
+        while (tableRecords.get(index).participantID.equals(participant)) {
+
+            if (newActivity == true) {
+                activity.name = tableRecords.get(index).activity;
+                activity.startHour = tableRecords.get(index).hour;
+                activity.startMinute = tableRecords.get(index).minute;
+                activity.startSecond = tableRecords.get(index).second;
+                newActivity = false;
+            }
+            else {
+                if (((tableRecords.get(index).activity).equals(tableRecords.get(index - 1).activity)) == false) {
+                    activity.endHour = tableRecords.get(index - 1).hour;
+                    activity.endMinute = tableRecords.get(index - 1).minute;
+                    activity.endSecond = tableRecords.get(index - 1).second;
+
+                    activity.duration = 
+                        (60*(activity.endHour - activity.startHour)) + (activity.endMinute - activity.startMinute);
+
+                    participantActivities.add(activity);
+                    activity = new Activity();
+                    newActivity = true;
+                    index--;
+                }
+            }
+
+            index++;
+        }
+
+        for (int i = 0; i < participantActivities.size(); i++) {
+            System.out.println(participantActivities.get(i).name + " - " + participantActivities.get(i).duration);
+        }
+        return participantActivities;
     }
 }
