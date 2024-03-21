@@ -2,19 +2,19 @@ import java.io.*;
 
 public class FileReadingTest {
 
+    /*
+     * This is the main function used to execute the program
+     */
     public static void main(String[] args) {
         try {
             // Initialise file writer
             FileWriter writer = new FileWriter("Data_Storage.txt");
 
-            writer.write("|----------|----------------|----------|--------|----------------|");
-            writer.write("\n");
-            writer.write("| Image ID | Participant ID |   Date   |  Time  | Activity Class |");
-            writer.write("\n");
-            writer.write("|----------|----------------|----------|--------|----------------|");
-            writer.write("\n");
+            // Write table headings in data storage file
+            writeHeadings(writer);
 
-            File participantsFolder = new File("C:\\Users\\User\\Documents\\COMP4092_ProjectCode\\Testing\\Files\\Participants");
+            // File participantsFolder = new File("C:\\Users\\User\\Documents\\COMP4092_ProjectCode\\Testing\\Files\\Participants");
+            File participantsFolder = new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\Testing\\Files\\Participants");
             File[] participants = participantsFolder.listFiles();
   
             // Iterate Participants folder (containing the participants)
@@ -29,6 +29,7 @@ public class FileReadingTest {
                     for (int k = 0; k < participantActivityImages.length; k++) {
                         String fileName = participantActivityImages[k].getName();
 
+                        // Extract all timestamp data from image
                         int year = Integer.valueOf(fileName.substring(4, 8));
                         int month = Integer.valueOf(fileName.substring(8, 10));
                         int day = Integer.valueOf(fileName.substring(10, 12));
@@ -36,59 +37,185 @@ public class FileReadingTest {
                         int minute = Integer.valueOf(fileName.substring(15, 17));
                         int second = Integer.valueOf(fileName.substring(17, 19));
 
-                        writer.write("|" + fileName.substring(28, 31));
-                        writer.write("       |");
-                        writer.write(participants[i].getName());
-                        writer.write("  |");
-                        if (day < 10) {
-                            writer.write("0" + day);
-                        }
-                        else {
-                            writer.write("" + day);
-                        }
-                        writer.write("/");
-                        if (month < 10) {
-                            writer.write("0" + month);
-                        }
-                        else {
-                            writer.write("" + month);
-                        }
-                        writer.write("/");
-                        writer.write("" + year);
-                        writer.write("|");
-                        if (hour < 10) {
-                            writer.write("0" + hour);
-                        }
-                        else {
-                            writer.write("" + hour);
-                        }
-                        writer.write(":");
-                        if (minute < 10) {
-                            writer.write("0" + minute);
-                        }
-                        else {
-                            writer.write("" + minute);
-                        }
-                        writer.write(":");
-                        if (second < 10) {
-                            writer.write("0" + second);
-                        }
-                        else {
-                            writer.write("" + second);
-                        }
-                        writer.write("|");
-                        writer.write(participantActivities[j].getName());
-                        for (int l = (16-(16-(participantActivities[j].getName().length()))); l < 16; l++) {
-                            writer.write(" ");
-                        }
-                        writer.write("|\n");
+                        // Write all data in data storage file
+                        writeImageID(writer, fileName);
+                        writeParticipantID(writer, participants, i);
+                        writeDay(writer, day);
+                        writeMonth(writer, month);
+                        writeYear(writer, year);
+                        writeHour(writer, hour);
+                        writeMinute(writer, minute);
+                        writeSecond(writer, second);
+                        writeActivity(writer, participantActivities, j);
                     }
                 }
             }
             writer.close();
         }
         catch (Exception e) {
-            System.err.println(e.getMessage()); 
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes each of the table headings in data storage file
+     */
+    public static void writeHeadings(Writer writer) {
+        try {
+            writer.write("|----------|----------------|----------|--------|----------------|");
+            writer.write("\n");
+            writer.write("| Image ID | Participant ID |   Date   |  Time  | Activity Class |");
+            writer.write("\n");
+            writer.write("|----------|----------------|----------|--------|----------------|");
+            writer.write("\n");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the ImageID data in the data storage file
+     */
+    public static void writeImageID(Writer writer, String fileName) {
+        try {
+            writer.write("|" + fileName.substring(28, 31));
+            writer.write("       |");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the ParticipantID data in the data storage file
+     */
+    public static void writeParticipantID(Writer writer, File[] participants, int i) {
+        try {
+            writer.write(participants[i].getName());
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the Day date data in the data storage file
+     */
+    public static void writeDay(Writer writer, int day) {
+        try {
+            writer.write("  |");
+            if (day < 10) {
+                writer.write("0" + day);
+            }
+            else {
+                writer.write("" + day);
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the Month date data in the data storage file
+     */
+    public static void writeMonth(Writer writer, int month) {
+        try {
+            writer.write("/");
+            if (month < 10) {
+                writer.write("0" + month);
+            }
+            else {
+                writer.write("" + month);
+            }
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the Year date data in the data storage file
+     */
+    public static void writeYear(Writer writer, int year) {
+        try {
+            writer.write("/");
+            writer.write("" + year);
+            writer.write("|");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the Hour time data in the data storage file
+     */
+    public static void writeHour(Writer writer, int hour) {
+        try {
+            if (hour < 10) {
+                writer.write("0" + hour);
+            }
+            else {
+                writer.write("" + hour);
+            }
+            writer.write(":");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the Minute time data in the data storage file
+     */
+    public static void writeMinute(Writer writer, int minute) {
+        try {
+            if (minute < 10) {
+                writer.write("0" + minute);
+            }
+            else {
+                writer.write("" + minute);
+            }
+            writer.write(":");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the Second time data in the data storage file
+     */
+    public static void writeSecond(Writer writer, int second) {
+        try {
+            if (second < 10) {
+                writer.write("0" + second);
+            }
+            else {
+                writer.write("" + second);
+            }
+            writer.write("|");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the Activity data in the data storage file
+     */
+    public static void writeActivity(Writer writer, File[] participantActivities, int j) {
+        try {
+            writer.write(participantActivities[j].getName());
+            for (int l = (16-(16-(participantActivities[j].getName().length()))); l < 16; l++) {
+                writer.write(" ");
+            }
+            writer.write("|\n");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
         }
     }
 }
