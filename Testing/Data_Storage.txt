@@ -169,3 +169,19 @@
 |083       |Participant_03  |10/07/2017|18:39:21|Watching TV     |
 |022       |Participant_03  |10/07/2017|18:54:21|Watching TV     |
 |029       |Participant_03  |10/07/2017|18:54:21|Watching TV     |
+|----------|----------------|----------|--------|----------------|
+ 
+ 
+ 
+|----------------|----------------|----------|
+| Participant ID | Activity Class | Duration |
+|----------------|----------------|----------|
+|Participant_01  |Driving         |329 mins  |
+|Participant_01  |Electronic      |329 mins  |
+|Participant_01  |Exercise        |030 mins  |
+|Participant_01  |Food            |298 mins  |
+|Participant_01  |Indoor          |091 mins  |
+|Participant_01  |Managing health |031 mins  |
+|Participant_01  |Socializing     |000 mins  |
+|Participant_01  |Study           |000 mins  |
+|----------------|----------------|----------|
