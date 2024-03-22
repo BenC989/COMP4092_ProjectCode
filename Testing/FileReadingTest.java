@@ -19,8 +19,11 @@ public class FileReadingTest {
             System.err.println("Error! " + e.getMessage()); 
         }
 
-        // Tabularise the data from the images
+        // Record the data from the images
         recordImageData();
+
+        // Sort the data in chronological order for each participant
+        sortImageTable(imageTableRecords);
 
         // Draw the Image Table in the data storage file
         fillImageTable(writer);
@@ -51,12 +54,12 @@ public class FileReadingTest {
                     String fileName = participantActivityImages[k].getName();
 
                     // Extract all timestamp data from image
-                    int year = Integer.valueOf(fileName.substring(4, 8));
-                    int month = Integer.valueOf(fileName.substring(8, 10));
-                    int day = Integer.valueOf(fileName.substring(10, 12));
-                    int hour = Integer.valueOf(fileName.substring(13, 15));
-                    int minute = Integer.valueOf(fileName.substring(15, 17));
-                    int second = Integer.valueOf(fileName.substring(17, 19));
+                    String year = fileName.substring(4, 8);
+                    String month = fileName.substring(8, 10);
+                    String day = fileName.substring(10, 12);
+                    String hour = fileName.substring(13, 15);
+                    String minute = fileName.substring(15, 17);
+                    String second = fileName.substring(17, 19);
 
                     // Get other image information
                     String imageID = fileName.substring(28, 31);
@@ -64,7 +67,8 @@ public class FileReadingTest {
                     String activity = participantActivities[j].getName();
 
                     // Add this image information to the table records
-                    Record record = new Record();
+                    String sortingVariable = participantID + year + month + day + hour + minute + second;
+                    Record record = new Record(sortingVariable);
                     record.imageID = imageID;
                     record.participantID = participantID;
                     record.day = day;
@@ -78,6 +82,13 @@ public class FileReadingTest {
                 }
             }
         }
+    }
+
+    /*
+     * This function sorts the Image Table records in chronological order for each participant
+     */
+    public static void sortImageTable(ArrayList<Record> list) {
+        list.sort((record1, record2) -> record1.getSortingVariable().compareTo(record2.getSortingVariable()));
     }
 
     /*
@@ -114,13 +125,13 @@ public class FileReadingTest {
 
                 // When it's the end of an activity
                 if (((tableRecords.get(index).activity).equals(tableRecords.get(index - 1).activity)) == false) {
-                    activity.endHour = tableRecords.get(index - 1).hour;
-                    activity.endMinute = tableRecords.get(index - 1).minute;
-                    activity.endSecond = tableRecords.get(index - 1).second;
+                    activity.endHour = tableRecords.get(index).hour;
+                    activity.endMinute = tableRecords.get(index).minute;
+                    activity.endSecond = tableRecords.get(index).second;
 
                     // Calculate the activity time duration in minutes
                     activity.duration = 
-                        (60*(activity.endHour - activity.startHour)) + (activity.endMinute - activity.startMinute);
+                        (60*(Integer.valueOf(activity.endHour) - Integer.valueOf(activity.startHour))) + (Integer.valueOf(activity.endMinute) - Integer.valueOf(activity.startMinute));
 
                     // Add this record to the participant's activity list
                     activityTableRecords.add(activity);
@@ -136,6 +147,9 @@ public class FileReadingTest {
         return activityTableRecords;
     }
 
+    /*
+     * This function writes all Image Table data to the text file
+     */
     public static void fillImageTable(Writer writer) {
         try {
             writeImageTableHeadings(writer);
@@ -162,6 +176,9 @@ public class FileReadingTest {
         }
     }
 
+    /*
+     * This function writes all Activity Table data to the text file
+     */
     public static void fillActivityTable(Writer writer) {
         try {
             writeActivityTableHeadings(writer);
@@ -226,15 +243,10 @@ public class FileReadingTest {
     /*
      * This function writes the Day date data in the Image Table in the data storage file
      */
-    public static void writeImageTableDay(Writer writer, int day) {
+    public static void writeImageTableDay(Writer writer, String day) {
         try {
             writer.write("  |");
-            if (day < 10) {
-                writer.write("0" + day);
-            }
-            else {
-                writer.write("" + day);
-            }
+            writer.write(day);
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -244,15 +256,10 @@ public class FileReadingTest {
     /*
      * This function writes the Month date data in the Image Table in the data storage file
      */
-    public static void writeImageTableMonth(Writer writer, int month) {
+    public static void writeImageTableMonth(Writer writer, String month) {
         try {
             writer.write("/");
-            if (month < 10) {
-                writer.write("0" + month);
-            }
-            else {
-                writer.write("" + month);
-            }
+            writer.write(month);
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -262,10 +269,10 @@ public class FileReadingTest {
     /*
      * This function writes the Year date data in the Image Table in the data storage file
      */
-    public static void writeImageTableYear(Writer writer, int year) {
+    public static void writeImageTableYear(Writer writer, String year) {
         try {
             writer.write("/");
-            writer.write("" + year);
+            writer.write(year);
             writer.write("|");
         }
         catch (Exception e) {
@@ -276,14 +283,9 @@ public class FileReadingTest {
     /*
      * This function writes the Hour time data in the Image Table in the data storage file
      */
-    public static void writeImageTableHour(Writer writer, int hour) {
+    public static void writeImageTableHour(Writer writer, String hour) {
         try {
-            if (hour < 10) {
-                writer.write("0" + hour);
-            }
-            else {
-                writer.write("" + hour);
-            }
+            writer.write(hour);
             writer.write(":");
         }
         catch (Exception e) {
@@ -294,14 +296,9 @@ public class FileReadingTest {
     /*
      * This function writes the Minute time data in the Image Table in the data storage file
      */
-    public static void writeImageTableMinute(Writer writer, int minute) {
+    public static void writeImageTableMinute(Writer writer, String minute) {
         try {
-            if (minute < 10) {
-                writer.write("0" + minute);
-            }
-            else {
-                writer.write("" + minute);
-            }
+            writer.write(minute);
             writer.write(":");
         }
         catch (Exception e) {
@@ -312,14 +309,9 @@ public class FileReadingTest {
     /*
      * This function writes the Second time data in the Image Table in the data storage file
      */
-    public static void writeImageTableSecond(Writer writer, int second) {
+    public static void writeImageTableSecond(Writer writer, String second) {
         try {
-            if (second < 10) {
-                writer.write("0" + second);
-            }
-            else {
-                writer.write("" + second);
-            }
+            writer.write(second);
             writer.write("|");
         }
         catch (Exception e) {

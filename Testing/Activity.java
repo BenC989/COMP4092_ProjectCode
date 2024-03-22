@@ -2,13 +2,13 @@ public class Activity {
     String participant;
     String name;
 
-    int startHour;
-    int startMinute;
-    int startSecond;
+    String startHour;
+    String startMinute;
+    String startSecond;
 
-    int endHour;
-    int endMinute;
-    int endSecond;
+    String endHour;
+    String endMinute;
+    String endSecond;
 
     int duration;
 }
