@@ -1,4 +1,5 @@
 public class Activity {
+    String participant;
     String name;
 
     int startHour;
