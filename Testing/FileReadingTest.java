@@ -51,10 +51,10 @@ public class FileReadingTest {
             File[] activityClass = activityClasses[i].listFiles();
 
             // Only consider folders that have the "Processed" folder
-            if (activityClass != null && activityClass.length > 2) {
+            if (activityClass != null && activityClass.length > 3) {
 
                 // Only look at files from the "Processed" folder
-                File processed = activityClass[2];
+                File processed = activityClass[3];
 
                 // Search through the activity folder
                 File[] processedSubFolders = processed.listFiles();
@@ -88,6 +88,52 @@ public class FileReadingTest {
                                 String imageID = fileName.substring(28, 31);
                                 String participantID = participants[j].getName();
                                 String activity = activityName.getName();
+
+                                // Adjust timestamp information
+                                int intImageID = Integer.valueOf(imageID);
+                                int intDay = Integer.valueOf(day);
+                                int intHour = Integer.valueOf(hour);
+                                int intMinute = Integer.valueOf(minute);
+                                int intSecond = Integer.valueOf(second);
+                                int secondsToAdd = intImageID * 10;
+
+                                for (int l = 0; l < (secondsToAdd - 5); l++) {
+                                    if (intSecond == 60) {
+                                        intSecond = 0;
+                                        intMinute++;
+                                    }
+                                    if (intMinute == 60) {
+                                        intMinute = 0;
+                                        intHour++;
+                                    }
+                                    if (intHour == 24) {
+                                        intHour = 0;
+                                        intDay++;
+                                    }
+                                    intSecond++;
+                                }
+
+                                day = "";
+                                hour = "";
+                                minute = "";
+                                second = "";
+
+                                if (intDay < 10) {
+                                    day = "0";
+                                }
+                                if (intHour < 10) {
+                                    hour = "0";
+                                }
+                                if (intMinute < 10) {
+                                    minute = "0";
+                                }
+                                if (intSecond < 10) {
+                                    second = "0";
+                                }
+                                day += intDay;
+                                hour += intHour;
+                                minute += intMinute;
+                                second += intSecond;
 
                                 // Add this image information to the table records
                                 String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
@@ -137,10 +183,6 @@ public class FileReadingTest {
 
         // Get all the records for this specific participant
         while (tableRecords.get(index).participantID.equals(participant)) {
-
-            /*
-             * There is an error with the timestamp. The correct time is the file timestamp plus (ImageID x 10)
-             */
 
             // When there a new activity is found
             if (newActivity == true) {
@@ -199,7 +241,7 @@ public class FileReadingTest {
             }
 
             // Complete the table
-            writer.write("|----------|----------------|----------|--------|----------------|");
+            writer.write("|----------|----------------|----------|--------|-------------------|");
             writer.write("\n \n \n \n");
         }
         catch (Exception e) {
@@ -221,7 +263,7 @@ public class FileReadingTest {
             }
 
             // Complete the table
-            writer.write("|----------------|----------------|----------|");
+            writer.write("|----------------|-------------------|----------|");
             writer.close();
         }
         catch (Exception e) {
@@ -234,11 +276,11 @@ public class FileReadingTest {
      */
     public static void writeImageTableHeadings(Writer writer) {
         try {
-            writer.write("|----------|----------------|----------|--------|----------------|");
+            writer.write("|----------|----------------|----------|--------|-------------------|");
             writer.write("\n");
-            writer.write("| Image ID | Participant ID |   Date   |  Time  | Activity Class |");
+            writer.write("| Image ID | Participant ID |   Date   |  Time  |  Activity Class   |");
             writer.write("\n");
-            writer.write("|----------|----------------|----------|--------|----------------|");
+            writer.write("|----------|----------------|----------|--------|-------------------|");
             writer.write("\n");
         }
         catch (Exception e) {
@@ -356,7 +398,7 @@ public class FileReadingTest {
     public static void writeImageTableActivity(Writer writer, String activity) {
         try {
             writer.write(activity);
-            for (int l = (16-(16-(activity.length()))); l < 16; l++) {
+            for (int l = (19-(19-(activity.length()))); l < 19; l++) {
                 writer.write(" ");
             }
             writer.write("|\n");
@@ -371,11 +413,11 @@ public class FileReadingTest {
      */
     public static void writeActivityTableHeadings(Writer writer) {
         try {
-            writer.write("|----------------|----------------|----------|");
+            writer.write("|----------------|-------------------|----------|");
             writer.write("\n");
-            writer.write("| Participant ID | Activity Class | Duration |");
+            writer.write("| Participant ID |  Activity Class   | Duration |");
             writer.write("\n");
-            writer.write("|----------------|----------------|----------|");
+            writer.write("|----------------|-------------------|----------|");
             writer.write("\n");
         }
         catch (Exception e) {
@@ -402,7 +444,7 @@ public class FileReadingTest {
     public static void writeActivityTableActivity(Writer writer, String activity) {
         try {
             writer.write(activity);
-            for (int l = (16-(16-(activity.length()))); l < 16; l++) {
+            for (int l = (19-(19-(activity.length()))); l < 19; l++) {
                 writer.write(" ");
             }
             writer.write("|");
