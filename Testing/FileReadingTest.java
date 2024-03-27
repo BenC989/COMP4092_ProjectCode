@@ -1,4 +1,6 @@
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 
 public class FileReadingTest {
@@ -29,56 +31,80 @@ public class FileReadingTest {
         fillImageTable(writer);
 
         // EXAMPLE: Make an example call to participant activities function
-        participantActivities(writer, "Participant_01", imageTableRecords);
+        participantActivities(writer, "01", imageTableRecords);
 
         // Draw the Activity Table in the data storage file
         fillActivityTable(writer);
     }
 
+    /*
+     * This function iterates through all records in the dataset and creates a list of image records
+     */
     public static void recordImageData() {
 
         // Set the file path for getting image data
-        File participantsFolder = new File("C:\\Users\\User\\Documents\\COMP4092_ProjectCode\\Testing\\Files\\Participants");
-        File[] participants = participantsFolder.listFiles();
+        File projectFolder = new File("Z:\\Patient work project\\Body Camera Data");
+        File[] activityClasses = projectFolder.listFiles();
 
-        // Iterate Participants folder (containing the participants)
-        for (int i = 0; i < participants.length; i++) { 
+        // Iterate through all activity classes
+        for (int i = 0; i < activityClasses.length; i++) { 
+            File[] activityClass = activityClasses[i].listFiles();
 
-            // Iterate Participants -> Participant folder (containing the activities)
-            File[] participantActivities = participants[i].listFiles();
-            for (int j = 0; j < participantActivities.length; j++) {
+            // Only consider folders that have the "Processed" folder
+            if (activityClass != null && activityClass.length > 2) {
 
-                // Iterate Participants -> Participant -> Activity (containing the images)
-                File[] participantActivityImages = participantActivities[j].listFiles();
-                for (int k = 0; k < participantActivityImages.length; k++) {
-                    String fileName = participantActivityImages[k].getName();
+                // Only look at files from the "Processed" folder
+                File processed = activityClass[2];
 
-                    // Extract all timestamp data from image
-                    String year = fileName.substring(4, 8);
-                    String month = fileName.substring(8, 10);
-                    String day = fileName.substring(10, 12);
-                    String hour = fileName.substring(13, 15);
-                    String minute = fileName.substring(15, 17);
-                    String second = fileName.substring(17, 19);
+                // Search through the activity folder
+                File[] processedSubFolders = processed.listFiles();
+                File activityName = processedSubFolders[0];
+                if (activityName.getName().equals(".DS_Store")) {
+                    activityName = processedSubFolders[1];
+                }
 
-                    // Get other image information
-                    String imageID = fileName.substring(28, 31);
-                    String participantID = participants[i].getName();
-                    String activity = participantActivities[j].getName();
+                // Iterate through all participants
+                File[] participants = activityName.listFiles();
+                for (int j = 0; j < participants.length; j++) { 
 
-                    // Add this image information to the table records
-                    String sortingVariable = participantID + year + month + day + hour + minute + second;
-                    Record record = new Record(sortingVariable);
-                    record.imageID = imageID;
-                    record.participantID = participantID;
-                    record.day = day;
-                    record.month = month;
-                    record.year = year;
-                    record.hour = hour;
-                    record.minute = minute;
-                    record.second = second;
-                    record.activity = activity;
-                    imageTableRecords.add(record);
+                    File[] images = participants[j].listFiles();
+
+                    // Iterate through each participant's image files
+                    if (images != null) {
+                        for (int k = 0; k < images.length; k++) { 
+                            String fileName = images[k].getName();
+
+                            if (fileName.startsWith("PSS")) {
+
+                                // Extract all timestamp data from image
+                                String year = fileName.substring(4, 8);
+                                String month = fileName.substring(8, 10);
+                                String day = fileName.substring(10, 12);
+                                String hour = fileName.substring(13, 15);
+                                String minute = fileName.substring(15, 17);
+                                String second = fileName.substring(17, 19);
+
+                                // Get other image information
+                                String imageID = fileName.substring(28, 31);
+                                String participantID = participants[j].getName();
+                                String activity = activityName.getName();
+
+                                // Add this image information to the table records
+                                String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
+                                Record record = new Record(sortingVariable);
+                                record.imageID = imageID;
+                                record.participantID = participantID;
+                                record.day = day;
+                                record.month = month;
+                                record.year = year;
+                                record.hour = hour;
+                                record.minute = minute;
+                                record.second = second;
+                                record.activity = activity;
+                                imageTableRecords.add(record);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -111,6 +137,10 @@ public class FileReadingTest {
 
         // Get all the records for this specific participant
         while (tableRecords.get(index).participantID.equals(participant)) {
+
+            /*
+             * There is an error with the timestamp. The correct time is the file timestamp plus (ImageID x 10)
+             */
 
             // When there a new activity is found
             if (newActivity == true) {
@@ -165,6 +195,7 @@ public class FileReadingTest {
                 writeImageTableMinute(writer, i.minute);
                 writeImageTableSecond(writer, i.second);
                 writeImageTableActivity(writer, i.activity);
+                //System.out.println(i.imageID + " " + i.participantID + " " + i.day + " " + i.month + " " + i.year + " " + i.hour + " " + i.minute+ " " + i.second + " " + i.activity);
             }
 
             // Complete the table
@@ -233,7 +264,7 @@ public class FileReadingTest {
      */
     public static void writeImageTableParticipantID(Writer writer, String participantID) {
         try {
-            writer.write(participantID);
+            writer.write(participantID + "            ");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -358,7 +389,7 @@ public class FileReadingTest {
     public static void writeActivityTableParticipantID(Writer writer, String participantID) {
         try {
             writer.write("|" + participantID);
-            writer.write("  |");
+            writer.write("              |");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
