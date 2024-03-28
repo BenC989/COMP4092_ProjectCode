@@ -31,7 +31,7 @@ public class FileReadingTest {
         sortImageTable(imageTableRecords);
 
         // EXAMPLE: Make an example call to participant activities function
-        participantActivities(writer, "01", imageTableRecords);
+        participantActivities(writer, "26", imageTableRecords);
 
         // Draw the Image Table in the data storage file
         fillImageTable(writer);
@@ -200,49 +200,54 @@ public class FileReadingTest {
                 activity.startSecond = tableRecords.get(index).second;
                 newActivity = false;
             }
-            else {
 
-                // When it's the end of an activity
-                if (((tableRecords.get(index).activity).equals(tableRecords.get(index - 1).activity)) == false) {
-                    activity.endDay = tableRecords.get(index).day;
-                    activity.endMonth = tableRecords.get(index).month;
-                    activity.endYear = tableRecords.get(index).year;
-                    activity.endHour = tableRecords.get(index).hour;
-                    activity.endMinute = tableRecords.get(index).minute;
-                    activity.endSecond = tableRecords.get(index).second;
+            // When it's the end of an activity
+            if (((index + 1) == tableRecords.size())
+                || ((tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity)) == false
+                    || ((tableRecords.get(index+1).participantID).equals(participant)) == false) {
 
-                    // Adjust the duration for an activity between two days
-                    if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
-                        int temp = Integer.valueOf(activity.endHour) + 24;
-                        activity.endHour = String.valueOf(temp);
-                    }
-                    
-                    // Calculate activity duration in seconds only
-                    int durationInSeconds =
-                        (3600 * (Integer.valueOf(activity.endHour) - Integer.valueOf(activity.startHour)))
-                        +
-                        (60 * (Integer.valueOf(activity.endMinute) - Integer.valueOf(activity.startMinute)))
-                        +
-                        (Integer.valueOf(activity.endSecond) - Integer.valueOf(activity.startSecond));
-                    activity.endHour = tableRecords.get(index).hour;
+                activity.endDay = tableRecords.get(index).day;
+                activity.endMonth = tableRecords.get(index).month;
+                activity.endYear = tableRecords.get(index).year;
+                activity.endHour = tableRecords.get(index).hour;
+                activity.endMinute = tableRecords.get(index).minute;
+                activity.endSecond = tableRecords.get(index).second;
 
-                    // Calculate activity duration in hours, minutes, and seconds
-                    int hours = durationInSeconds / 3600;
-                    durationInSeconds = durationInSeconds % 3600;
-                    int minutes = durationInSeconds / 60;
-                    durationInSeconds = durationInSeconds % 60;
-                    int seconds = durationInSeconds;
-                    activity.durationHours = String.valueOf(hours);
-                    activity.durationMinutes = String.valueOf(minutes);
-                    activity.durationSeconds = String.valueOf(seconds);
+                // Adjust the duration for an activity between two days
+                if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
+                    int temp = Integer.valueOf(activity.endHour) + 24;
+                    activity.endHour = String.valueOf(temp);
+                }
+                
+                // Calculate activity duration in seconds only
+                int durationInSeconds =
+                    (3600 * (Integer.valueOf(activity.endHour) - Integer.valueOf(activity.startHour)))
+                    +
+                    (60 * (Integer.valueOf(activity.endMinute) - Integer.valueOf(activity.startMinute)))
+                    +
+                    (Integer.valueOf(activity.endSecond) - Integer.valueOf(activity.startSecond));
+                activity.endHour = tableRecords.get(index).hour;
 
-                    // Add this record to the participant's activity list
-                    activityTableRecords.add(activity);
+                // Calculate activity duration in hours, minutes, and seconds
+                int hours = durationInSeconds / 3600;
+                durationInSeconds = durationInSeconds % 3600;
+                int minutes = durationInSeconds / 60;
+                durationInSeconds = durationInSeconds % 60;
+                int seconds = durationInSeconds;
+                activity.durationHours = String.valueOf(hours);
+                activity.durationMinutes = String.valueOf(minutes);
+                activity.durationSeconds = String.valueOf(seconds);
 
+                // Add this record to the participant's activity list
+                activityTableRecords.add(activity);
+
+                if ((index + 1) == tableRecords.size()) {
+                    break; // you shouldn't need a break statement. remove later if you dont need it
+                }
+                else {
                     // Identify that a new activity has begun
                     activity = new ActivityRecord();
                     newActivity = true;
-                    index--;
                 }
             }
             index++;
