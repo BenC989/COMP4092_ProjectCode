@@ -3,11 +3,15 @@ public class Activity {
     String name;
 
     String startDay;
+    String startMonth;
+    String startYear;
     String startHour;
     String startMinute;
     String startSecond;
 
     String endDay;
+    String endMonth;
+    String endYear;
     String endHour;
     String endMinute;
     String endSecond;

@@ -192,6 +192,8 @@ public class FileReadingTest {
                 activity.participant = participant;
                 activity.name = tableRecords.get(index).activity;
                 activity.startDay = tableRecords.get(index).day;
+                activity.startMonth = tableRecords.get(index).month;
+                activity.startYear = tableRecords.get(index).year;
                 activity.startHour = tableRecords.get(index).hour;
                 activity.startMinute = tableRecords.get(index).minute;
                 activity.startSecond = tableRecords.get(index).second;
@@ -202,6 +204,8 @@ public class FileReadingTest {
                 // When it's the end of an activity
                 if (((tableRecords.get(index).activity).equals(tableRecords.get(index - 1).activity)) == false) {
                     activity.endDay = tableRecords.get(index).day;
+                    activity.endMonth = tableRecords.get(index).month;
+                    activity.endYear = tableRecords.get(index).year;
                     activity.endHour = tableRecords.get(index).hour;
                     activity.endMinute = tableRecords.get(index).minute;
                     activity.endSecond = tableRecords.get(index).second;
@@ -210,7 +214,6 @@ public class FileReadingTest {
                     if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
                         int temp = Integer.valueOf(activity.endHour) + 24;
                         activity.endHour = String.valueOf(temp);
-                        System.out.println(activity.endHour);
                     }
                     
                     // Calculate activity duration in seconds
@@ -284,11 +287,13 @@ public class FileReadingTest {
             for (Activity i : activityTableRecords) {
                 writeActivityTableParticipantID(writer, i.participant);
                 writeActivityTableActivity(writer, i.name);
+                writeActivityTableStartDT(writer, i);
+                writeActivityTableEndDT(writer, i);
                 writeActivityTableDuration(writer, i);
             }
 
             // Complete the table
-            writer.write("|----------------|-------------------|------------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
             writer.close();
         }
         catch (Exception e) {
@@ -438,11 +443,11 @@ public class FileReadingTest {
      */
     public static void writeActivityTableHeadings(Writer writer) {
         try {
-            writer.write("|----------------|-------------------|------------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
             writer.write("\n");
-            writer.write("| Participant ID |  Activity Class   |  Duration  |");
+            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |");
             writer.write("\n");
-            writer.write("|----------------|-------------------|------------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
             writer.write("\n");
         }
         catch (Exception e) {
@@ -472,6 +477,52 @@ public class FileReadingTest {
             for (int l = (19-(19-(activity.length()))); l < 19; l++) {
                 writer.write(" ");
             }
+            writer.write("|");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the Start date and time for an activity in the Activity Table in the data storage file
+     */
+    public static void writeActivityTableStartDT(Writer writer, Activity activity) {
+        try {
+            writer.write(activity.startDay);
+            writer.write("/");
+            writer.write(activity.startMonth);
+            writer.write("/");
+            writer.write(activity.startYear);
+            writer.write(" - ");
+            writer.write(activity.startHour);
+            writer.write(":");
+            writer.write(activity.startMinute);
+            writer.write(":");
+            writer.write(activity.startSecond);
+            writer.write("|");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    /*
+     * This function writes the End date and time for an activity in the Activity Table in the data storage file
+     */
+    public static void writeActivityTableEndDT(Writer writer, Activity activity) {
+        try {
+            writer.write(activity.endDay);
+            writer.write("/");
+            writer.write(activity.endMonth);
+            writer.write("/");
+            writer.write(activity.endYear);
+            writer.write(" - ");
+            writer.write(activity.endHour);
+            writer.write(":");
+            writer.write(activity.endMinute);
+            writer.write(":");
+            writer.write(activity.endSecond);
             writer.write("|");
         }
         catch (Exception e) {
