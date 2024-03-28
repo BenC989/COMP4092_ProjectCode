@@ -1,4 +1,4 @@
-public class Activity {
+public class ActivityRecord {
     String participant;
     String name;
 

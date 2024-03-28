@@ -1,11 +1,14 @@
+// Import all required libraries
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 
 public class FileReadingTest {
-    static ArrayList<Record> imageTableRecords = new ArrayList<>();
-    static ArrayList<Activity> activityTableRecords = new ArrayList<>();
+
+    // Create the lists of records
+    static ArrayList<ImageRecord> imageTableRecords = new ArrayList<>();
+    static ArrayList<ActivityRecord> activityTableRecords = new ArrayList<>();
     static FileWriter writer;
 
     /*
@@ -27,11 +30,11 @@ public class FileReadingTest {
         // Sort the data in chronological order for each participant
         sortImageTable(imageTableRecords);
 
+        // EXAMPLE: Make an example call to participant activities function
+        participantActivities(writer, "01", imageTableRecords);
+
         // Draw the Image Table in the data storage file
         fillImageTable(writer);
-
-        // EXAMPLE: Make an example call to participant activities function
-        participantActivities(writer, "24", imageTableRecords);
 
         // Draw the Activity Table in the data storage file
         fillActivityTable(writer);
@@ -49,6 +52,7 @@ public class FileReadingTest {
         // Iterate through all activity classes
         for (int i = 0; i < activityClasses.length; i++) { 
 
+            // Do not look through the Representative Images folder
             if ((activityClasses[i].getName().equals("Representative Images")) == false) {
                 File[] activityClass = activityClasses[i].listFiles();
 
@@ -98,7 +102,6 @@ public class FileReadingTest {
                                     int intMinute = Integer.valueOf(minute);
                                     int intSecond = Integer.valueOf(second);
                                     int secondsToAdd = intImageID * 10;
-
                                     for (int l = 0; l < (secondsToAdd - 5); l++) {
                                         if (intSecond == 60) {
                                             intSecond = 0;
@@ -114,12 +117,10 @@ public class FileReadingTest {
                                         }
                                         intSecond++;
                                     }
-
                                     day = "";
                                     hour = "";
                                     minute = "";
                                     second = "";
-
                                     if (intDay < 10) {
                                         day = "0";
                                     }
@@ -139,7 +140,7 @@ public class FileReadingTest {
 
                                     // Add this image information to the table records
                                     String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
-                                    Record record = new Record(sortingVariable);
+                                    ImageRecord record = new ImageRecord(sortingVariable);
                                     record.imageID = imageID;
                                     record.participantID = participantID;
                                     record.day = day;
@@ -162,14 +163,14 @@ public class FileReadingTest {
     /*
      * This function sorts the Image Table records in chronological order for each participant
      */
-    public static void sortImageTable(ArrayList<Record> list) {
+    public static void sortImageTable(ArrayList<ImageRecord> list) {
         list.sort((record1, record2) -> record1.getSortingVariable().compareTo(record2.getSortingVariable()));
     }
 
     /*
      * This function considers one participant and calculates the time duration for each of their activities
      */
-    public static ArrayList<Activity> participantActivities(Writer writer, String participant, ArrayList<Record> tableRecords) {
+    public static ArrayList<ActivityRecord> participantActivities(Writer writer, String participant, ArrayList<ImageRecord> tableRecords) {
 
         // Store the participant's activities
         activityTableRecords = new ArrayList<>();
@@ -177,7 +178,7 @@ public class FileReadingTest {
         // Define variables
         int index = 0;
         boolean newActivity = true;
-        Activity activity = new Activity();
+        ActivityRecord activity = new ActivityRecord();
 
         // Find the records for the specific participant
         while ((tableRecords.get(index).participantID.equals(participant)) == false) {
@@ -210,13 +211,13 @@ public class FileReadingTest {
                     activity.endMinute = tableRecords.get(index).minute;
                     activity.endSecond = tableRecords.get(index).second;
 
-                    // Correct for duration between two days
+                    // Adjust the duration for an activity between two days
                     if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
                         int temp = Integer.valueOf(activity.endHour) + 24;
                         activity.endHour = String.valueOf(temp);
                     }
                     
-                    // Calculate activity duration in seconds
+                    // Calculate activity duration in seconds only
                     int durationInSeconds =
                         (3600 * (Integer.valueOf(activity.endHour) - Integer.valueOf(activity.startHour)))
                         +
@@ -225,6 +226,7 @@ public class FileReadingTest {
                         (Integer.valueOf(activity.endSecond) - Integer.valueOf(activity.startSecond));
                     activity.endHour = tableRecords.get(index).hour;
 
+                    // Calculate activity duration in hours, minutes, and seconds
                     int hours = durationInSeconds / 3600;
                     durationInSeconds = durationInSeconds % 3600;
                     int minutes = durationInSeconds / 60;
@@ -238,7 +240,7 @@ public class FileReadingTest {
                     activityTableRecords.add(activity);
 
                     // Identify that a new activity has begun
-                    activity = new Activity();
+                    activity = new ActivityRecord();
                     newActivity = true;
                     index--;
                 }
@@ -255,8 +257,7 @@ public class FileReadingTest {
         try {
             writeImageTableHeadings(writer);
 
-            for (Record i : imageTableRecords) {
-                // Write all data in data storage file
+            for (ImageRecord i : imageTableRecords) {
                 writeImageTableImageID(writer, i.imageID);
                 writeImageTableParticipantID(writer, i.participantID);
                 writeImageTableDay(writer, i.day);
@@ -284,7 +285,7 @@ public class FileReadingTest {
         try {
             writeActivityTableHeadings(writer);
 
-            for (Activity i : activityTableRecords) {
+            for (ActivityRecord i : activityTableRecords) {
                 writeActivityTableParticipantID(writer, i.participant);
                 writeActivityTableActivity(writer, i.name);
                 writeActivityTableStartDT(writer, i);
@@ -487,7 +488,7 @@ public class FileReadingTest {
     /*
      * This function writes the Start date and time for an activity in the Activity Table in the data storage file
      */
-    public static void writeActivityTableStartDT(Writer writer, Activity activity) {
+    public static void writeActivityTableStartDT(Writer writer, ActivityRecord activity) {
         try {
             writer.write(activity.startDay);
             writer.write("/");
@@ -510,7 +511,7 @@ public class FileReadingTest {
     /*
      * This function writes the End date and time for an activity in the Activity Table in the data storage file
      */
-    public static void writeActivityTableEndDT(Writer writer, Activity activity) {
+    public static void writeActivityTableEndDT(Writer writer, ActivityRecord activity) {
         try {
             writer.write(activity.endDay);
             writer.write("/");
@@ -533,7 +534,7 @@ public class FileReadingTest {
     /*
      * This function writes the Duration data in the Activity Table in the data storage file
      */
-    public static void writeActivityTableDuration(Writer writer, Activity activity) {
+    public static void writeActivityTableDuration(Writer writer, ActivityRecord activity) {
         try {
             String answer = "";
             if (Integer.valueOf(activity.durationHours) < 10) {

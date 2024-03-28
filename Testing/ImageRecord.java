@@ -1,4 +1,4 @@
-public class Record {
+public class ImageRecord {
     String imageID;
     String participantID;
     String year;
@@ -11,7 +11,7 @@ public class Record {
 
     private String sortingVariable = "";
 
-    public Record(String sortingVariable) {
+    public ImageRecord(String sortingVariable) {
         this.sortingVariable = sortingVariable;
     }
 
