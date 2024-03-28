@@ -31,7 +31,7 @@ public class FileReadingTest {
         fillImageTable(writer);
 
         // EXAMPLE: Make an example call to participant activities function
-        participantActivities(writer, "01", imageTableRecords);
+        participantActivities(writer, "24", imageTableRecords);
 
         // Draw the Activity Table in the data storage file
         fillActivityTable(writer);
@@ -48,106 +48,109 @@ public class FileReadingTest {
 
         // Iterate through all activity classes
         for (int i = 0; i < activityClasses.length; i++) { 
-            File[] activityClass = activityClasses[i].listFiles();
 
-            // Only consider folders that have the "Processed" folder
-            if (activityClass != null && activityClass.length > 3) {
+            if ((activityClasses[i].getName().equals("Representative Images")) == false) {
+                File[] activityClass = activityClasses[i].listFiles();
 
-                // Only look at files from the "Processed" folder
-                File processed = activityClass[3];
+                // Only consider folders that have the "Processed" folder
+                if (activityClass != null && activityClass.length > 3) {
 
-                // Search through the activity folder
-                File[] processedSubFolders = processed.listFiles();
-                File activityName = processedSubFolders[0];
-                if (activityName.getName().equals(".DS_Store")) {
-                    activityName = processedSubFolders[1];
-                }
+                    // Only look at files from the "Processed" folder
+                    File processed = activityClass[3];
 
-                // Iterate through all participants
-                File[] participants = activityName.listFiles();
-                for (int j = 0; j < participants.length; j++) { 
+                    // Search through the activity folder
+                    File[] processedSubFolders = processed.listFiles();
+                    File activityName = processedSubFolders[0];
+                    if (activityName.getName().equals(".DS_Store")) {
+                        activityName = processedSubFolders[1];
+                    }
 
-                    File[] images = participants[j].listFiles();
+                    // Iterate through all participants
+                    File[] participants = activityName.listFiles();
+                    for (int j = 0; j < participants.length; j++) { 
 
-                    // Iterate through each participant's image files
-                    if (images != null) {
-                        for (int k = 0; k < images.length; k++) { 
-                            String fileName = images[k].getName();
+                        File[] images = participants[j].listFiles();
 
-                            if (fileName.startsWith("PSS")) {
+                        // Iterate through each participant's image files
+                        if (images != null) {
+                            for (int k = 0; k < images.length; k++) { 
+                                String fileName = images[k].getName();
 
-                                // Extract all timestamp data from image
-                                String year = fileName.substring(4, 8);
-                                String month = fileName.substring(8, 10);
-                                String day = fileName.substring(10, 12);
-                                String hour = fileName.substring(13, 15);
-                                String minute = fileName.substring(15, 17);
-                                String second = fileName.substring(17, 19);
+                                if (fileName.startsWith("PSS")) {
 
-                                // Get other image information
-                                String imageID = fileName.substring(28, 31);
-                                String participantID = participants[j].getName();
-                                String activity = activityName.getName();
+                                    // Extract all timestamp data from image
+                                    String year = fileName.substring(4, 8);
+                                    String month = fileName.substring(8, 10);
+                                    String day = fileName.substring(10, 12);
+                                    String hour = fileName.substring(13, 15);
+                                    String minute = fileName.substring(15, 17);
+                                    String second = fileName.substring(17, 19);
 
-                                // Adjust timestamp information
-                                int intImageID = Integer.valueOf(imageID);
-                                int intDay = Integer.valueOf(day);
-                                int intHour = Integer.valueOf(hour);
-                                int intMinute = Integer.valueOf(minute);
-                                int intSecond = Integer.valueOf(second);
-                                int secondsToAdd = intImageID * 10;
+                                    // Get other image information
+                                    String imageID = fileName.substring(28, 31);
+                                    String participantID = participants[j].getName();
+                                    String activity = activityName.getName();
 
-                                for (int l = 0; l < (secondsToAdd - 5); l++) {
-                                    if (intSecond == 60) {
-                                        intSecond = 0;
-                                        intMinute++;
+                                    // Adjust timestamp information
+                                    int intImageID = Integer.valueOf(imageID);
+                                    int intDay = Integer.valueOf(day);
+                                    int intHour = Integer.valueOf(hour);
+                                    int intMinute = Integer.valueOf(minute);
+                                    int intSecond = Integer.valueOf(second);
+                                    int secondsToAdd = intImageID * 10;
+
+                                    for (int l = 0; l < (secondsToAdd - 5); l++) {
+                                        if (intSecond == 60) {
+                                            intSecond = 0;
+                                            intMinute++;
+                                        }
+                                        if (intMinute == 60) {
+                                            intMinute = 0;
+                                            intHour++;
+                                        }
+                                        if (intHour == 24) {
+                                            intHour = 0;
+                                            intDay++;
+                                        }
+                                        intSecond++;
                                     }
-                                    if (intMinute == 60) {
-                                        intMinute = 0;
-                                        intHour++;
+
+                                    day = "";
+                                    hour = "";
+                                    minute = "";
+                                    second = "";
+
+                                    if (intDay < 10) {
+                                        day = "0";
                                     }
-                                    if (intHour == 24) {
-                                        intHour = 0;
-                                        intDay++;
+                                    if (intHour < 10) {
+                                        hour = "0";
                                     }
-                                    intSecond++;
-                                }
+                                    if (intMinute < 10) {
+                                        minute = "0";
+                                    }
+                                    if (intSecond < 10) {
+                                        second = "0";
+                                    }
+                                    day += intDay;
+                                    hour += intHour;
+                                    minute += intMinute;
+                                    second += intSecond;
 
-                                day = "";
-                                hour = "";
-                                minute = "";
-                                second = "";
-
-                                if (intDay < 10) {
-                                    day = "0";
+                                    // Add this image information to the table records
+                                    String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
+                                    Record record = new Record(sortingVariable);
+                                    record.imageID = imageID;
+                                    record.participantID = participantID;
+                                    record.day = day;
+                                    record.month = month;
+                                    record.year = year;
+                                    record.hour = hour;
+                                    record.minute = minute;
+                                    record.second = second;
+                                    record.activity = activity;
+                                    imageTableRecords.add(record);
                                 }
-                                if (intHour < 10) {
-                                    hour = "0";
-                                }
-                                if (intMinute < 10) {
-                                    minute = "0";
-                                }
-                                if (intSecond < 10) {
-                                    second = "0";
-                                }
-                                day += intDay;
-                                hour += intHour;
-                                minute += intMinute;
-                                second += intSecond;
-
-                                // Add this image information to the table records
-                                String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
-                                Record record = new Record(sortingVariable);
-                                record.imageID = imageID;
-                                record.participantID = participantID;
-                                record.day = day;
-                                record.month = month;
-                                record.year = year;
-                                record.hour = hour;
-                                record.minute = minute;
-                                record.second = second;
-                                record.activity = activity;
-                                imageTableRecords.add(record);
                             }
                         }
                     }
@@ -188,6 +191,7 @@ public class FileReadingTest {
             if (newActivity == true) {
                 activity.participant = participant;
                 activity.name = tableRecords.get(index).activity;
+                activity.startDay = tableRecords.get(index).day;
                 activity.startHour = tableRecords.get(index).hour;
                 activity.startMinute = tableRecords.get(index).minute;
                 activity.startSecond = tableRecords.get(index).second;
@@ -197,16 +201,26 @@ public class FileReadingTest {
 
                 // When it's the end of an activity
                 if (((tableRecords.get(index).activity).equals(tableRecords.get(index - 1).activity)) == false) {
+                    activity.endDay = tableRecords.get(index).day;
                     activity.endHour = tableRecords.get(index).hour;
                     activity.endMinute = tableRecords.get(index).minute;
                     activity.endSecond = tableRecords.get(index).second;
+
+                    // Correct for duration between two days
+                    if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
+                        System.out.println("yes");
+                        int temp = Integer.valueOf(activity.endHour + 24);
+                        activity.endHour = String.valueOf(temp);
+                    }
                     
+                    // Calculate activity duration in seconds
                     activity.duration =
                         (3600 * (Integer.valueOf(activity.endHour) - Integer.valueOf(activity.startHour)))
                         +
                         (60 * (Integer.valueOf(activity.endMinute) - Integer.valueOf(activity.startMinute)))
                         +
                         (Integer.valueOf(activity.endSecond) - Integer.valueOf(activity.startSecond));
+                    activity.endHour = tableRecords.get(index).hour;
 
                     // Add this record to the participant's activity list
                     activityTableRecords.add(activity);
@@ -240,7 +254,6 @@ public class FileReadingTest {
                 writeImageTableMinute(writer, i.minute);
                 writeImageTableSecond(writer, i.second);
                 writeImageTableActivity(writer, i.activity);
-                //System.out.println(i.imageID + " " + i.participantID + " " + i.day + " " + i.month + " " + i.year + " " + i.hour + " " + i.minute+ " " + i.second + " " + i.activity);
             }
 
             // Complete the table

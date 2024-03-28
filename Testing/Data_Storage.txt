@@ -36577,32 +36577,29 @@
 |----------------|-------------------|------------|
 | Participant ID |  Activity Class   |  Duration  |
 |----------------|-------------------|------------|
-|01              |Electronic Devices |001690 secs |
-|01              |Managing Health    |000260 secs |
-|01              |Indoor             |000267 secs |
-|01              |Managing Health    |000002 secs |
-|01              |Indoor             |000008 secs |
-|01              |Managing Health    |000360 secs |
-|01              |Food Related       |000950 secs |
-|01              |Managing Health    |000230 secs |
-|01              |Food Related       |000510 secs |
-|01              |Indoor             |000220 secs |
-|01              |Deliberate Exercise|000200 secs |
-|01              |Socializing        |000150 secs |
-|01              |Deliberate Exercise|001680 secs |
-|01              |Indoor             |000420 secs |
-|01              |Electronic Devices |000440 secs |
-|01              |Indoor             |000720 secs |
-|01              |Electronic Devices |011912 secs |
-|01              |Food Related       |000020 secs |
-|01              |Electronic Devices |000020 secs |
-|01              |Food Related       |000058 secs |
-|01              |Indoor             |000002 secs |
-|01              |Food Related       |000008 secs |
-|01              |Indoor             |000010 secs |
-|01              |Food Related       |000180 secs |
-|01              |Indoor             |000380 secs |
-|01              |Food Related       |000090 secs |
-|01              |Electronic Devices |000010 secs |
-|01              |Food Related       |000140 secs |
+|24              |Indoor             |000150 secs |
+|24              |Food Related       |000750 secs |
+|24              |Indoor             |000000 secs |
+|24              |Food Related       |000010 secs |
+|24              |Indoor             |000300 secs |
+|24              |Deliberate Exercise|000599 secs |
+|24              |Indoor             |001390 secs |
+|24              |Food Related       |001278 secs |
+|24              |Indoor             |000198 secs |
+|24              |Food Related       |003099 secs |
+|24              |Sleeping           |004609 secs |
+|24              |Food Related       |000320 secs |
+|24              |Managing Health    |000000 secs |
+|24              |Food Related       |000010 secs |
+|24              |Managing Health    |000420 secs |
+|24              |Food Related       |001500 secs |
+|24              |Indoor             |000590 secs |
+|24              |Sleeping           |3255232 secs |
+|24              |Indoor             |003558 secs |
+|24              |Food Related       |000210 secs |
+|24              |Indoor             |001888 secs |
+|24              |Socializing        |000230 secs |
+|24              |Indoor             |008026 secs |
+|24              |Food Related       |002787 secs |
+|24              |Indoor             |015203 secs |
 |----------------|-------------------|------------|
