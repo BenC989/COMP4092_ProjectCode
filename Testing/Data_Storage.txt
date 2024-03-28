@@ -36574,35 +36574,35 @@
  
  
  
-|----------------|-------------------|----------|
-| Participant ID |  Activity Class   | Duration |
-|----------------|-------------------|----------|
-|01              |Electronic Devices |028 mins  |
-|01              |Managing Health    |004 mins  |
-|01              |Indoor             |005 mins  |
-|01              |Managing Health    |000 mins  |
-|01              |Indoor             |000 mins  |
-|01              |Managing Health    |006 mins  |
-|01              |Food Related       |016 mins  |
-|01              |Managing Health    |004 mins  |
-|01              |Food Related       |008 mins  |
-|01              |Indoor             |004 mins  |
-|01              |Deliberate Exercise|003 mins  |
-|01              |Socializing        |003 mins  |
-|01              |Deliberate Exercise|028 mins  |
-|01              |Indoor             |007 mins  |
-|01              |Electronic Devices |007 mins  |
-|01              |Indoor             |012 mins  |
-|01              |Electronic Devices |199 mins  |
-|01              |Food Related       |000 mins  |
-|01              |Electronic Devices |000 mins  |
-|01              |Food Related       |001 mins  |
-|01              |Indoor             |000 mins  |
-|01              |Food Related       |000 mins  |
-|01              |Indoor             |001 mins  |
-|01              |Food Related       |003 mins  |
-|01              |Indoor             |006 mins  |
-|01              |Food Related       |001 mins  |
-|01              |Electronic Devices |001 mins  |
-|01              |Food Related       |002 mins  |
-|----------------|-------------------|----------|
+|----------------|-------------------|------------|
+| Participant ID |  Activity Class   |  Duration  |
+|----------------|-------------------|------------|
+|01              |Electronic Devices |001690 secs |
+|01              |Managing Health    |000260 secs |
+|01              |Indoor             |000267 secs |
+|01              |Managing Health    |000002 secs |
+|01              |Indoor             |000008 secs |
+|01              |Managing Health    |000360 secs |
+|01              |Food Related       |000950 secs |
+|01              |Managing Health    |000230 secs |
+|01              |Food Related       |000510 secs |
+|01              |Indoor             |000220 secs |
+|01              |Deliberate Exercise|000200 secs |
+|01              |Socializing        |000150 secs |
+|01              |Deliberate Exercise|001680 secs |
+|01              |Indoor             |000420 secs |
+|01              |Electronic Devices |000440 secs |
+|01              |Indoor             |000720 secs |
+|01              |Electronic Devices |011912 secs |
+|01              |Food Related       |000020 secs |
+|01              |Electronic Devices |000020 secs |
+|01              |Food Related       |000058 secs |
+|01              |Indoor             |000002 secs |
+|01              |Food Related       |000008 secs |
+|01              |Indoor             |000010 secs |
+|01              |Food Related       |000180 secs |
+|01              |Indoor             |000380 secs |
+|01              |Food Related       |000090 secs |
+|01              |Electronic Devices |000010 secs |
+|01              |Food Related       |000140 secs |
+|----------------|-------------------|------------|

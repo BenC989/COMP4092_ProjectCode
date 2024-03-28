@@ -200,10 +200,13 @@ public class FileReadingTest {
                     activity.endHour = tableRecords.get(index).hour;
                     activity.endMinute = tableRecords.get(index).minute;
                     activity.endSecond = tableRecords.get(index).second;
-
-                    // Calculate the activity time duration in minutes
-                    activity.duration = 
-                        (60*(Integer.valueOf(activity.endHour) - Integer.valueOf(activity.startHour))) + (Integer.valueOf(activity.endMinute) - Integer.valueOf(activity.startMinute));
+                    
+                    activity.duration =
+                        (3600 * (Integer.valueOf(activity.endHour) - Integer.valueOf(activity.startHour)))
+                        +
+                        (60 * (Integer.valueOf(activity.endMinute) - Integer.valueOf(activity.startMinute)))
+                        +
+                        (Integer.valueOf(activity.endSecond) - Integer.valueOf(activity.startSecond));
 
                     // Add this record to the participant's activity list
                     activityTableRecords.add(activity);
@@ -263,7 +266,7 @@ public class FileReadingTest {
             }
 
             // Complete the table
-            writer.write("|----------------|-------------------|----------|");
+            writer.write("|----------------|-------------------|------------|");
             writer.close();
         }
         catch (Exception e) {
@@ -413,11 +416,11 @@ public class FileReadingTest {
      */
     public static void writeActivityTableHeadings(Writer writer) {
         try {
-            writer.write("|----------------|-------------------|----------|");
+            writer.write("|----------------|-------------------|------------|");
             writer.write("\n");
-            writer.write("| Participant ID |  Activity Class   | Duration |");
+            writer.write("| Participant ID |  Activity Class   |  Duration  |");
             writer.write("\n");
-            writer.write("|----------------|-------------------|----------|");
+            writer.write("|----------------|-------------------|------------|");
             writer.write("\n");
         }
         catch (Exception e) {
@@ -460,6 +463,15 @@ public class FileReadingTest {
     public static void writeActivityTableDuration(Writer writer, int duration) {
         try {
             String answer = "";
+            if (duration < 100000) {
+                answer = answer + 0;
+            }
+            if (duration < 10000) {
+                answer = answer + 0;
+            }
+            if (duration < 1000) {
+                answer = answer + 0;
+            }
             if (duration < 100) {
                 answer = answer + 0;
             }
@@ -468,7 +480,7 @@ public class FileReadingTest {
             }
             answer = answer + duration;
             writer.write(answer);
-            writer.write(" mins  |\n");
+            writer.write(" secs |\n");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
