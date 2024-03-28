@@ -208,19 +208,28 @@ public class FileReadingTest {
 
                     // Correct for duration between two days
                     if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
-                        System.out.println("yes");
-                        int temp = Integer.valueOf(activity.endHour + 24);
+                        int temp = Integer.valueOf(activity.endHour) + 24;
                         activity.endHour = String.valueOf(temp);
+                        System.out.println(activity.endHour);
                     }
                     
                     // Calculate activity duration in seconds
-                    activity.duration =
+                    int durationInSeconds =
                         (3600 * (Integer.valueOf(activity.endHour) - Integer.valueOf(activity.startHour)))
                         +
                         (60 * (Integer.valueOf(activity.endMinute) - Integer.valueOf(activity.startMinute)))
                         +
                         (Integer.valueOf(activity.endSecond) - Integer.valueOf(activity.startSecond));
                     activity.endHour = tableRecords.get(index).hour;
+
+                    int hours = durationInSeconds / 3600;
+                    durationInSeconds = durationInSeconds % 3600;
+                    int minutes = durationInSeconds / 60;
+                    durationInSeconds = durationInSeconds % 60;
+                    int seconds = durationInSeconds;
+                    activity.durationHours = String.valueOf(hours);
+                    activity.durationMinutes = String.valueOf(minutes);
+                    activity.durationSeconds = String.valueOf(seconds);
 
                     // Add this record to the participant's activity list
                     activityTableRecords.add(activity);
@@ -275,7 +284,7 @@ public class FileReadingTest {
             for (Activity i : activityTableRecords) {
                 writeActivityTableParticipantID(writer, i.participant);
                 writeActivityTableActivity(writer, i.name);
-                writeActivityTableDuration(writer, i.duration);
+                writeActivityTableDuration(writer, i);
             }
 
             // Complete the table
@@ -473,27 +482,26 @@ public class FileReadingTest {
     /*
      * This function writes the Duration data in the Activity Table in the data storage file
      */
-    public static void writeActivityTableDuration(Writer writer, int duration) {
+    public static void writeActivityTableDuration(Writer writer, Activity activity) {
         try {
             String answer = "";
-            if (duration < 100000) {
-                answer = answer + 0;
+            if (Integer.valueOf(activity.durationHours) < 10) {
+                answer += 0;
             }
-            if (duration < 10000) {
-                answer = answer + 0;
+            answer += activity.durationHours;
+            answer += ":";
+            if (Integer.valueOf(activity.durationMinutes) < 10) {
+                answer += 0;
             }
-            if (duration < 1000) {
-                answer = answer + 0;
+            answer += activity.durationMinutes;
+            answer += ":";
+            if (Integer.valueOf(activity.durationSeconds) < 10) {
+                answer += 0;
             }
-            if (duration < 100) {
-                answer = answer + 0;
-            }
-            if (duration < 10) {
-                answer = answer + 0;
-            }
-            answer = answer + duration;
+            answer += activity.durationSeconds;
+
             writer.write(answer);
-            writer.write(" secs |\n");
+            writer.write("    |\n");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 

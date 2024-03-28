@@ -36577,29 +36577,29 @@
 |----------------|-------------------|------------|
 | Participant ID |  Activity Class   |  Duration  |
 |----------------|-------------------|------------|
-|24              |Indoor             |000150 secs |
-|24              |Food Related       |000750 secs |
-|24              |Indoor             |000000 secs |
-|24              |Food Related       |000010 secs |
-|24              |Indoor             |000300 secs |
-|24              |Deliberate Exercise|000599 secs |
-|24              |Indoor             |001390 secs |
-|24              |Food Related       |001278 secs |
-|24              |Indoor             |000198 secs |
-|24              |Food Related       |003099 secs |
-|24              |Sleeping           |004609 secs |
-|24              |Food Related       |000320 secs |
-|24              |Managing Health    |000000 secs |
-|24              |Food Related       |000010 secs |
-|24              |Managing Health    |000420 secs |
-|24              |Food Related       |001500 secs |
-|24              |Indoor             |000590 secs |
-|24              |Sleeping           |3255232 secs |
-|24              |Indoor             |003558 secs |
-|24              |Food Related       |000210 secs |
-|24              |Indoor             |001888 secs |
-|24              |Socializing        |000230 secs |
-|24              |Indoor             |008026 secs |
-|24              |Food Related       |002787 secs |
-|24              |Indoor             |015203 secs |
+|24              |Indoor             |00:02:30    |
+|24              |Food Related       |00:12:30    |
+|24              |Indoor             |00:00:00    |
+|24              |Food Related       |00:00:10    |
+|24              |Indoor             |00:05:00    |
+|24              |Deliberate Exercise|00:09:59    |
+|24              |Indoor             |00:23:10    |
+|24              |Food Related       |00:21:18    |
+|24              |Indoor             |00:03:18    |
+|24              |Food Related       |00:51:39    |
+|24              |Sleeping           |01:16:49    |
+|24              |Food Related       |00:05:20    |
+|24              |Managing Health    |00:00:00    |
+|24              |Food Related       |00:00:10    |
+|24              |Managing Health    |00:07:00    |
+|24              |Food Related       |00:25:00    |
+|24              |Indoor             |00:09:50    |
+|24              |Sleeping           |13:13:52    |
+|24              |Indoor             |00:59:18    |
+|24              |Food Related       |00:03:30    |
+|24              |Indoor             |00:31:28    |
+|24              |Socializing        |00:03:50    |
+|24              |Indoor             |02:13:46    |
+|24              |Food Related       |00:46:27    |
+|24              |Indoor             |04:13:23    |
 |----------------|-------------------|------------|

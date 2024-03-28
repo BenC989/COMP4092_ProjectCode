@@ -12,5 +12,7 @@ public class Activity {
     String endMinute;
     String endSecond;
 
-    int duration;
+    String durationHours;
+    String durationMinutes;
+    String durationSeconds;
 }
