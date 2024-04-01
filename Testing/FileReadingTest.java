@@ -174,8 +174,17 @@ public class FileReadingTest {
         while ((inBounds == true) && (foundParticipant) == false) {
             index++;
 
+            // Update loop guard
             inBounds = ((index + 1) != tableRecords.size());
             foundParticipant = (tableRecords.get(index).participantID.equals(participant));
+            if (inBounds == false) {
+                nextActivitySame = false;
+                nextParticipantSame = false;
+            }
+            else {
+                nextActivitySame = (tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity);
+                nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
+            }
         }
 
         // Get all the records for this specific participant
@@ -248,6 +257,8 @@ public class FileReadingTest {
                 }
             }
             index++;
+
+            // Update loop guard
             inBounds = ((index + 1) != tableRecords.size());
             foundParticipant = (tableRecords.get(index).participantID.equals(participant));
             if (inBounds == false) {
