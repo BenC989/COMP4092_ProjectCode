@@ -227,7 +227,6 @@ public class FileReadingTest {
                     (60 * (Integer.valueOf(activity.endMinute) - Integer.valueOf(activity.startMinute)))
                     +
                     (Integer.valueOf(activity.endSecond) - Integer.valueOf(activity.startSecond));
-                activity.endHour = tableRecords.get(index).hour;
 
                 // Calculate activity duration in hours, minutes, and seconds
                 int hours = durationInSeconds / 3600;
