@@ -9,10 +9,12 @@ public class FileReadingTest {
     // Create the lists of records
     static ArrayList<ImageRecord> imageTableRecords = new ArrayList<>();
     static ArrayList<ActivityRecord> activityTableRecords = new ArrayList<>();
+
+    // Create a file writer for the output
     static FileWriter writer;
 
     /*
-     * This is the main function used to execute the program
+     * This is the main function used to execute the entire program
      */
     public static void main(String[] args) {
 
@@ -24,24 +26,42 @@ public class FileReadingTest {
             System.err.println("Error! " + e.getMessage()); 
         }
 
-        // Record the data from the images
+        // Record the data from all the images
         recordImageData();
 
         // Sort the data in chronological order for each participant
         sortImageTable(imageTableRecords);
 
-        // EXAMPLE: Make an example call to participant activities function
-        participantActivities(writer, "26", imageTableRecords);
+        // Write all Image Table records to text file
+        // fillImageTable(writer);
 
-        // Draw the Image Table in the data storage file
-        fillImageTable(writer);
+        /*
+         * 1. Calculate duration for participant activities
+         * 2. Record the data 
+         * 3. Write all Activity Table records to text file
+         */ 
+        int numberOfParticipants = Integer.valueOf(imageTableRecords.get(imageTableRecords.size()-1).participantID);
+        for (int i = 1; i <= numberOfParticipants; i++) {
+            String ID = "";
+            if (i < 10) {
+                ID = "0";
+            }
+            ID += String.valueOf(i);
+            participantActivities(writer, ID, imageTableRecords);
+            fillActivityTable(writer);
+        }
 
-        // Draw the Activity Table in the data storage file
-        fillActivityTable(writer);
+        // Close the file writer
+        try {
+            writer.close();
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
     }
 
     /*
-     * This function iterates through all records in the dataset and creates a list of image records
+     * This function iterates through all Image records in the dataset and creates a consistent list
      */
     public static void recordImageData() {
 
@@ -56,7 +76,7 @@ public class FileReadingTest {
             if ((activityClasses[i].getName().equals("Representative Images")) == false) {
                 File[] activityClass = activityClasses[i].listFiles();
 
-                // Only consider folders that have the "Processed" folder
+                // Only consider folders that have the "Processed" sub-folder
                 if (activityClass != null && activityClass.length > 3) {
 
                     // Only look at files from the "Processed" folder
@@ -80,6 +100,7 @@ public class FileReadingTest {
                             for (int k = 0; k < images.length; k++) { 
                                 String fileName = images[k].getName();
 
+                                // Ensure that the type of file is correct
                                 if (fileName.startsWith("PSS")) {
 
                                     // Extract all timestamp data from image
@@ -96,47 +117,11 @@ public class FileReadingTest {
                                     String activity = activityName.getName();
 
                                     // Adjust timestamp information
-                                    int intImageID = Integer.valueOf(imageID);
-                                    int intDay = Integer.valueOf(day);
-                                    int intHour = Integer.valueOf(hour);
-                                    int intMinute = Integer.valueOf(minute);
-                                    int intSecond = Integer.valueOf(second);
-                                    int secondsToAdd = intImageID * 10;
-                                    for (int l = 0; l < (secondsToAdd - 5); l++) {
-                                        if (intSecond == 60) {
-                                            intSecond = 0;
-                                            intMinute++;
-                                        }
-                                        if (intMinute == 60) {
-                                            intMinute = 0;
-                                            intHour++;
-                                        }
-                                        if (intHour == 24) {
-                                            intHour = 0;
-                                            intDay++;
-                                        }
-                                        intSecond++;
-                                    }
-                                    day = "";
-                                    hour = "";
-                                    minute = "";
-                                    second = "";
-                                    if (intDay < 10) {
-                                        day = "0";
-                                    }
-                                    if (intHour < 10) {
-                                        hour = "0";
-                                    }
-                                    if (intMinute < 10) {
-                                        minute = "0";
-                                    }
-                                    if (intSecond < 10) {
-                                        second = "0";
-                                    }
-                                    day += intDay;
-                                    hour += intHour;
-                                    minute += intMinute;
-                                    second += intSecond;
+                                    String[] adjustedTimestamp = adjustTimestamp(imageID, day, hour, minute, second);
+                                    day = adjustedTimestamp[0];
+                                    hour = adjustedTimestamp[1];
+                                    minute = adjustedTimestamp[2];
+                                    second = adjustedTimestamp[3];
 
                                     // Add this image information to the table records
                                     String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
@@ -181,7 +166,7 @@ public class FileReadingTest {
         ActivityRecord activity = new ActivityRecord();
 
         // Find the records for the specific participant
-        while ((tableRecords.get(index).participantID.equals(participant)) == false) {
+        while (((index + 1) != tableRecords.size()) && (tableRecords.get(index).participantID.equals(participant)) == false) {
             index++;
         }
 
@@ -300,11 +285,64 @@ public class FileReadingTest {
 
             // Complete the table
             writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
-            writer.close();
+            writer.write("\n \n");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
         }
+    }
+
+    /*
+     * This function adjusts the timestamp to ensure correctness
+     */
+    public static String[] adjustTimestamp(String imageID, String day, String hour, String minute, String second) {
+        int intImageID = Integer.valueOf(imageID);
+        int intDay = Integer.valueOf(day);
+        int intHour = Integer.valueOf(hour);
+        int intMinute = Integer.valueOf(minute);
+        int intSecond = Integer.valueOf(second);
+        int secondsToAdd = intImageID * 10;
+        for (int l = 0; l < (secondsToAdd - 5); l++) {
+            if (intSecond == 60) {
+                intSecond = 0;
+                intMinute++;
+            }
+            if (intMinute == 60) {
+                intMinute = 0;
+                intHour++;
+            }
+            if (intHour == 24) {
+                intHour = 0;
+                intDay++;
+            }
+            intSecond++;
+        }
+        day = "";
+        hour = "";
+        minute = "";
+        second = "";
+        if (intDay < 10) {
+            day = "0";
+        }
+        if (intHour < 10) {
+            hour = "0";
+        }
+        if (intMinute < 10) {
+            minute = "0";
+        }
+        if (intSecond < 10) {
+            second = "0";
+        }
+        String[] answer = new String[4];
+        day += intDay;
+        hour += intHour;
+        minute += intMinute;
+        second += intSecond;
+        answer[0] = day;
+        answer[1] = hour;
+        answer[2] = minute;
+        answer[3] = second;
+        return answer;
     }
 
     /*
