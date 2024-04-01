@@ -171,7 +171,7 @@ public class FileReadingTest {
         }
 
         // Get all the records for this specific participant
-        while (tableRecords.get(index).participantID.equals(participant)) {
+        while (((index + 1) != tableRecords.size()) && (tableRecords.get(index).participantID.equals(participant))) {
 
             // When there a new activity is found
             if (newActivity == true) {
@@ -191,12 +191,23 @@ public class FileReadingTest {
                 || ((tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity)) == false
                     || ((tableRecords.get(index+1).participantID).equals(participant)) == false) {
 
-                activity.endDay = tableRecords.get(index).day;
-                activity.endMonth = tableRecords.get(index).month;
-                activity.endYear = tableRecords.get(index).year;
-                activity.endHour = tableRecords.get(index).hour;
-                activity.endMinute = tableRecords.get(index).minute;
-                activity.endSecond = tableRecords.get(index).second;
+                if (((index + 1) == tableRecords.size()) 
+                    || ((tableRecords.get(index+1).participantID).equals(participant)) == false) {
+                    activity.endDay = tableRecords.get(index).day;
+                    activity.endMonth = tableRecords.get(index).month;
+                    activity.endYear = tableRecords.get(index).year;
+                    activity.endHour = tableRecords.get(index).hour;
+                    activity.endMinute = tableRecords.get(index).minute;
+                    activity.endSecond = tableRecords.get(index).second;
+                }
+                else {
+                    activity.endDay = tableRecords.get(index+1).day;
+                    activity.endMonth = tableRecords.get(index+1).month;
+                    activity.endYear = tableRecords.get(index+1).year;
+                    activity.endHour = tableRecords.get(index+1).hour;
+                    activity.endMinute = tableRecords.get(index+1).minute;
+                    activity.endSecond = tableRecords.get(index+1).second;
+                }
 
                 // Adjust the duration for an activity between two days
                 if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
@@ -225,11 +236,7 @@ public class FileReadingTest {
 
                 // Add this record to the participant's activity list
                 activityTableRecords.add(activity);
-
-                if ((index + 1) == tableRecords.size()) {
-                    break; // you shouldn't need a break statement. remove later if you dont need it
-                }
-                else {
+                if ((index + 1) != tableRecords.size()) {
                     // Identify that a new activity has begun
                     activity = new ActivityRecord();
                     newActivity = true;
