@@ -10,7 +10,7 @@ public class FileReadingTest {
     static ArrayList<ImageRecord> imageTableRecords = new ArrayList<>();
     static ArrayList<ActivityRecord> activityTableRecords = new ArrayList<>();
 
-    // Create a file writer for the output
+    // Create a file writer for the data output
     static FileWriter writer;
 
     /*
@@ -33,12 +33,13 @@ public class FileReadingTest {
         sortImageTable(imageTableRecords);
 
         // Write all Image Table records to text file
-        // fillImageTable(writer);
+        fillImageTable(writer);
 
         /*
          * 1. Calculate duration for participant activities
          * 2. Record the data 
          * 3. Write all Activity Table records to text file
+         * 4. Repeat for all participants
          */ 
         int numberOfParticipants = Integer.valueOf(imageTableRecords.get(imageTableRecords.size()-1).participantID);
         for (int i = 1; i <= numberOfParticipants; i++) {
@@ -164,16 +165,23 @@ public class FileReadingTest {
         int index = 0;
         boolean newActivity = true;
         ActivityRecord activity = new ActivityRecord();
+        boolean inBounds = ((index + 1) != tableRecords.size());
+        boolean foundParticipant = (tableRecords.get(index).participantID.equals(participant));
+        boolean nextActivitySame = (tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity);
+        boolean nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
 
-        // Find the records for the specific participant
-        while (((index + 1) != tableRecords.size()) && (tableRecords.get(index).participantID.equals(participant)) == false) {
+        // Search the list of Image records until the correct participant is found
+        while ((inBounds == true) && (foundParticipant) == false) {
             index++;
+
+            inBounds = ((index + 1) != tableRecords.size());
+            foundParticipant = (tableRecords.get(index).participantID.equals(participant));
         }
 
         // Get all the records for this specific participant
-        while (((index + 1) != tableRecords.size()) && (tableRecords.get(index).participantID.equals(participant))) {
+        while ((inBounds == true) && (foundParticipant) == true) {
 
-            // When there a new activity is found
+            // When there is a new activity, record start date/time
             if (newActivity == true) {
                 activity.participant = participant;
                 activity.name = tableRecords.get(index).activity;
@@ -186,13 +194,10 @@ public class FileReadingTest {
                 newActivity = false;
             }
 
-            // When it's the end of an activity
-            if (((index + 1) == tableRecords.size())
-                || ((tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity)) == false
-                    || ((tableRecords.get(index+1).participantID).equals(participant)) == false) {
+            // When it's the end of an activity, record end date/time
+            if ((inBounds == false) || (nextActivitySame == false) || (nextParticipantSame == false)) {
 
-                if (((index + 1) == tableRecords.size()) 
-                    || ((tableRecords.get(index+1).participantID).equals(participant)) == false) {
+                if ((inBounds == false) || (nextParticipantSame == false)) {
                     activity.endDay = tableRecords.get(index).day;
                     activity.endMonth = tableRecords.get(index).month;
                     activity.endYear = tableRecords.get(index).year;
@@ -236,13 +241,24 @@ public class FileReadingTest {
 
                 // Add this record to the participant's activity list
                 activityTableRecords.add(activity);
-                if ((index + 1) != tableRecords.size()) {
-                    // Identify that a new activity has begun
+
+                // Identify that a new activity has begun
+                if (inBounds == true) {
                     activity = new ActivityRecord();
                     newActivity = true;
                 }
             }
             index++;
+            inBounds = ((index + 1) != tableRecords.size());
+            foundParticipant = (tableRecords.get(index).participantID.equals(participant));
+            if (inBounds == false) {
+                nextActivitySame = false;
+                nextParticipantSame = false;
+            }
+            else {
+                nextActivitySame = (tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity);
+                nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
+            }
         }
         return activityTableRecords;
     }
@@ -252,8 +268,15 @@ public class FileReadingTest {
      */
     public static void fillImageTable(Writer writer) {
         try {
-            writeImageTableHeadings(writer);
+            // Write the Image Table headings
+            writer.write("|----------|----------------|----------|--------|-------------------|");
+            writer.write("\n");
+            writer.write("| Image ID | Participant ID |   Date   |  Time  |  Activity Class   |");
+            writer.write("\n");
+            writer.write("|----------|----------------|----------|--------|-------------------|");
+            writer.write("\n");
 
+            // Write the Image Table records
             for (ImageRecord i : imageTableRecords) {
                 writeImageTableImageID(writer, i.imageID);
                 writeImageTableParticipantID(writer, i.participantID);
@@ -280,8 +303,15 @@ public class FileReadingTest {
      */
     public static void fillActivityTable(Writer writer) {
         try {
-            writeActivityTableHeadings(writer);
+            // Write the Activity Table headings
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
+            writer.write("\n");
+            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |");
+            writer.write("\n");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
+            writer.write("\n");
 
+            // Write the Activity Table records
             for (ActivityRecord i : activityTableRecords) {
                 writeActivityTableParticipantID(writer, i.participant);
                 writeActivityTableActivity(writer, i.name);
@@ -300,14 +330,18 @@ public class FileReadingTest {
     }
 
     /*
-     * This function adjusts the timestamp to ensure correctness
+     * This function adjusts the timestamp to ensure data correctness
      */
     public static String[] adjustTimestamp(String imageID, String day, String hour, String minute, String second) {
+        
+        // Define variables
         int intImageID = Integer.valueOf(imageID);
         int intDay = Integer.valueOf(day);
         int intHour = Integer.valueOf(hour);
         int intMinute = Integer.valueOf(minute);
         int intSecond = Integer.valueOf(second);
+
+        // Adjust the timestamp information based on the Image ID
         int secondsToAdd = intImageID * 10;
         for (int l = 0; l < (secondsToAdd - 5); l++) {
             if (intSecond == 60) {
@@ -324,6 +358,8 @@ public class FileReadingTest {
             }
             intSecond++;
         }
+
+        // Transform the new timestamp data into Strings
         day = "";
         hour = "";
         minute = "";
@@ -345,28 +381,13 @@ public class FileReadingTest {
         hour += intHour;
         minute += intMinute;
         second += intSecond;
+
+        // Store the correct timestamp information in an array
         answer[0] = day;
         answer[1] = hour;
         answer[2] = minute;
         answer[3] = second;
         return answer;
-    }
-
-    /*
-     * This function writes each of the Image Table headings in data storage file
-     */
-    public static void writeImageTableHeadings(Writer writer) {
-        try {
-            writer.write("|----------|----------------|----------|--------|-------------------|");
-            writer.write("\n");
-            writer.write("| Image ID | Participant ID |   Date   |  Time  |  Activity Class   |");
-            writer.write("\n");
-            writer.write("|----------|----------------|----------|--------|-------------------|");
-            writer.write("\n");
-        }
-        catch (Exception e) {
-            System.err.println("Error! " + e.getMessage()); 
-        }
     }
 
     /*
@@ -483,23 +504,6 @@ public class FileReadingTest {
                 writer.write(" ");
             }
             writer.write("|\n");
-        }
-        catch (Exception e) {
-            System.err.println("Error! " + e.getMessage()); 
-        }
-    }
-
-    /*
-     * This function writes each of the table headings in the Activity Table in the data storage file
-     */
-    public static void writeActivityTableHeadings(Writer writer) {
-        try {
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
-            writer.write("\n");
-            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |");
-            writer.write("\n");
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
-            writer.write("\n");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
