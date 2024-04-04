@@ -247,6 +247,16 @@ public class FileReadingTest {
                 activity.durationMinutes = String.valueOf(minutes);
                 activity.durationSeconds = String.valueOf(seconds);
 
+                // Re-correct the activity end hour
+                if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
+                    int temp = Integer.valueOf(activity.endHour) - 24;
+                    String result = "";
+                    if (temp < 10) {
+                        result = "0";
+                    }
+                    activity.endHour = result + temp;
+                }
+
                 // Add this record to the participant's activity list
                 activityTableRecords.add(activity);
 
