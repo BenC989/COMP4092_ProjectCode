@@ -1,6 +1,7 @@
 public class ActivityRecord {
     String participant;
     String name;
+    String representative;
 
     String startDay;
     String startMonth;

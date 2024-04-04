@@ -200,6 +200,7 @@ public class FileReadingTest {
                 activity.startHour = tableRecords.get(index).hour;
                 activity.startMinute = tableRecords.get(index).minute;
                 activity.startSecond = tableRecords.get(index).second;
+                activity.representative = tableRecords.get(index).imageID;
                 newActivity = false;
             }
 
@@ -324,11 +325,11 @@ public class FileReadingTest {
     public static void fillActivityTable(Writer writer) {
         try {
             // Write the Activity Table headings
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------|----------|");
             writer.write("\n");
-            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |");
+            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  | Rep Image | Location |");
             writer.write("\n");
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------|----------|");
             writer.write("\n");
 
             // Write the Activity Table records
@@ -338,10 +339,11 @@ public class FileReadingTest {
                 writeActivityTableStartDT(writer, i);
                 writeActivityTableEndDT(writer, i);
                 writeActivityTableDuration(writer, i);
+                writeActivityTableRepresentative(writer, i);
             }
 
             // Complete the table
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------|----------|");
             writer.write("\n \n");
         }
         catch (Exception e) {
@@ -627,7 +629,16 @@ public class FileReadingTest {
             answer += activity.durationSeconds;
 
             writer.write(answer);
-            writer.write("    |\n");
+            writer.write("    |");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    public static void writeActivityTableRepresentative(Writer writer, ActivityRecord activity) {
+        try {
+            writer.write(activity.representative + "        |\n");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
