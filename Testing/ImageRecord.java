@@ -1,4 +1,5 @@
 public class ImageRecord {
+    String fileName;
     String imageID;
     String participantID;
     String year;

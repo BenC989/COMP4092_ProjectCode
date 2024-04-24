@@ -127,6 +127,7 @@ public class FileReadingTest {
                                     // Add this image information to the table records
                                     String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
                                     ImageRecord record = new ImageRecord(sortingVariable);
+                                    record.fileName = fileName;
                                     record.imageID = imageID;
                                     record.participantID = participantID;
                                     record.day = day;
@@ -200,7 +201,7 @@ public class FileReadingTest {
                 activity.startHour = tableRecords.get(index).hour;
                 activity.startMinute = tableRecords.get(index).minute;
                 activity.startSecond = tableRecords.get(index).second;
-                activity.representative = tableRecords.get(index).imageID;
+                activity.representative = tableRecords.get(index).fileName;
                 newActivity = false;
             }
 
@@ -325,11 +326,11 @@ public class FileReadingTest {
     public static void fillActivityTable(Writer writer) {
         try {
             // Write the Activity Table headings
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------|----------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------------------------------|--------------|");
             writer.write("\n");
-            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  | Rep Image | Location |");
+            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |   Representative Image File Name  |   Location   |");
             writer.write("\n");
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------|----------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------------------------------|--------------|");
             writer.write("\n");
 
             // Write the Activity Table records
@@ -343,7 +344,7 @@ public class FileReadingTest {
             }
 
             // Complete the table
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------|----------|");
+            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------------------------------|--------------|");
             writer.write("\n \n");
         }
         catch (Exception e) {
@@ -638,7 +639,7 @@ public class FileReadingTest {
 
     public static void writeActivityTableRepresentative(Writer writer, ActivityRecord activity) {
         try {
-            writer.write(activity.representative + "        |\n");
+            writer.write(activity.representative + "|\n");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
