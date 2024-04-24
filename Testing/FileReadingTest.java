@@ -170,6 +170,7 @@ public class FileReadingTest {
         boolean foundParticipant = (tableRecords.get(index).participantID.equals(participant));
         boolean nextActivitySame = (tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity);
         boolean nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
+        int representativeImageIndex = 1;
 
         // Search the list of Image records until the correct participant is found
         while ((inBounds == true) && (foundParticipant) == false) {
@@ -193,6 +194,7 @@ public class FileReadingTest {
 
             // When there is a new activity, record start date/time
             if (newActivity == true) {
+                representativeImageIndex = 1;
                 activity.participant = participant;
                 activity.name = tableRecords.get(index).activity;
                 activity.startDay = tableRecords.get(index).day;
@@ -201,12 +203,13 @@ public class FileReadingTest {
                 activity.startHour = tableRecords.get(index).hour;
                 activity.startMinute = tableRecords.get(index).minute;
                 activity.startSecond = tableRecords.get(index).second;
-                activity.representative = tableRecords.get(index).fileName;
                 newActivity = false;
             }
 
             // When it's the end of an activity, record end date/time
             if ((inBounds == false) || (nextActivitySame == false) || (nextParticipantSame == false)) {
+
+                activity.representative = tableRecords.get(index - (representativeImageIndex / 2)).fileName;
 
                 if ((inBounds == false) || (nextParticipantSame == false)) {
                     activity.endDay = tableRecords.get(index).day;
@@ -267,6 +270,9 @@ public class FileReadingTest {
                     activity = new ActivityRecord();
                     newActivity = true;
                 }
+            }
+            else {
+                representativeImageIndex++;
             }
             index++;
 
