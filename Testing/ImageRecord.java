@@ -9,6 +9,7 @@ public class ImageRecord {
     String minute;
     String second;
     String activity;
+    double imageAverage;
 
     private String sortingVariable = "";
 

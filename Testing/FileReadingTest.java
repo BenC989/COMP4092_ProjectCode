@@ -4,6 +4,11 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
+import java.awt.image.Raster;
+import java.awt.image.BufferedImage;
+
 public class FileReadingTest {
 
     // Create the lists of records
@@ -59,6 +64,8 @@ public class FileReadingTest {
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
         }
+
+        System.out.println("############### ALL FINISHED! ###############");
     }
 
     /*
@@ -137,6 +144,11 @@ public class FileReadingTest {
                                     record.minute = minute;
                                     record.second = second;
                                     record.activity = activity;
+                                    try {
+                                        BufferedImage image = ImageIO.read(images[k]);
+                                        record.imageAverage = singleImageAverage(image);
+                                    }
+                                    catch (Exception e) {}
                                     imageTableRecords.add(record);
                                 }
                             }
@@ -189,11 +201,15 @@ public class FileReadingTest {
             }
         }
 
+        ArrayList<ImageRecord> activityImageRecords = new ArrayList<>();
+
         // Get all the records for this specific participant
         while ((inBounds == true) && (foundParticipant) == true) {
 
             // When there is a new activity, record start date/time
             if (newActivity == true) {
+                activityImageRecords = new ArrayList<>();
+
                 representativeImageIndex = 1;
                 activity.participant = participant;
                 activity.name = tableRecords.get(index).activity;
@@ -206,10 +222,12 @@ public class FileReadingTest {
                 newActivity = false;
             }
 
+            activityImageRecords.add(tableRecords.get(index));
+
             // When it's the end of an activity, record end date/time
             if ((inBounds == false) || (nextActivitySame == false) || (nextParticipantSame == false)) {
 
-                activity.representative = tableRecords.get(index - (representativeImageIndex / 2)).fileName;
+                activity.representative = calculateRepresentativeImage(activityImageRecords);
 
                 if ((inBounds == false) || (nextParticipantSame == false)) {
                     activity.endDay = tableRecords.get(index).day;
@@ -288,6 +306,7 @@ public class FileReadingTest {
                 nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
             }
         }
+        System.out.println(activityTableRecords.size());
         return activityTableRecords;
     }
 
@@ -332,11 +351,15 @@ public class FileReadingTest {
     public static void fillActivityTable(Writer writer) {
         try {
             // Write the Activity Table headings
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------------------------------|--------------|");
+            writer.write("|----------------|-------------------|---------------------|"
+            + "---------------------|------------|-----------------------------------|"
+            + "--------------|");
             writer.write("\n");
             writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |   Representative Image File Name  |   Location   |");
             writer.write("\n");
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------------------------------|--------------|");
+            writer.write("|----------------|-------------------|---------------------|"
+            + "---------------------|------------|-----------------------------------|"
+            + "--------------|");
             writer.write("\n");
 
             // Write the Activity Table records
@@ -350,7 +373,9 @@ public class FileReadingTest {
             }
 
             // Complete the table
-            writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------------------------------|--------------|");
+            writer.write("|----------------|-------------------|---------------------|"
+            + "---------------------|------------|-----------------------------------|"
+            + "--------------|");
             writer.write("\n \n");
         }
         catch (Exception e) {
@@ -650,5 +675,41 @@ public class FileReadingTest {
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
         }
+    }
+
+    public static double singleImageAverage(BufferedImage image) {
+        double sum = 0;
+
+        Raster raster = image.getRaster();
+        for (int y = 0; y < image.getHeight(); ++y) {
+            for (int x = 0; x < image.getWidth(); ++x) {
+                sum += raster.getSample(x, y, 0) ;
+            }
+        }
+        double answer = sum / (image.getWidth() * image.getHeight());
+        return answer;
+    }
+
+    public static String calculateRepresentativeImage(ArrayList<ImageRecord> activityImageRecords) {
+        double sum = 0;
+
+        for (ImageRecord i : activityImageRecords) {
+            sum += i.imageAverage;
+        }
+
+        double average = sum / activityImageRecords.size();
+
+        // Find the image with the closest value to the average
+        ImageRecord closestImage = activityImageRecords.get(0);
+        double closestDistance = Integer.MAX_VALUE;
+
+        for (ImageRecord i : activityImageRecords) {
+            if (Math.abs(average - i.imageAverage) < closestDistance) {
+                closestDistance = Math.abs(average - i.imageAverage);
+                closestImage = i;
+            }
+        }
+
+        return closestImage.fileName;
     }
 }
