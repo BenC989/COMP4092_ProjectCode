@@ -51,6 +51,7 @@ public class FileReadingTest {
             ID += String.valueOf(i);
             participantActivities(writer, ID, imageTableRecords);
             fillActivityTable(writer);
+            participantActivitiesTotalDuration(writer, ID, activityTableRecords);
         }
 
         // Close the file writer
@@ -386,7 +387,7 @@ public class FileReadingTest {
 
             // Complete the table
             writer.write("|----------------|-------------------|---------------------|---------------------|------------|-----------------------------------|--------------|");
-            writer.write("\n \n");
+            writer.write("\n");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -686,4 +687,62 @@ public class FileReadingTest {
             System.err.println("Error! " + e.getMessage()); 
         }
     }
+
+    public static void participantActivitiesTotalDuration(Writer writer, String participant, ArrayList<ActivityRecord> tableRecords) {
+        participantActivityTotalDuration(writer, participant, tableRecords, "Socializing");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Electronic Devices");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Food Related");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Managing Health");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Indoor");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Deliberate Exercise");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Driving");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Shopping");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Sleeping");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Watching TV");
+    }
+
+    public static void participantActivityTotalDuration(Writer writer, String participant, ArrayList<ActivityRecord> tableRecords, String activityName) {
+        int durationInSeconds = 0;
+
+        for (ActivityRecord i : activityTableRecords) {
+            if (i.name.equals(activityName)) {
+                durationInSeconds += (Integer.parseInt(i.durationHours) * 3600);
+                durationInSeconds += (Integer.parseInt(i.durationMinutes) * 60);
+                durationInSeconds += (Integer.parseInt(i.durationSeconds));
+            }
+        }
+        int hours = durationInSeconds / 3600;
+        durationInSeconds = durationInSeconds % 3600;
+        int minutes = durationInSeconds / 60;
+        durationInSeconds = durationInSeconds % 60;
+        int seconds = durationInSeconds;
+        
+        String hoursString = "";
+        String minutesString = "";
+        String secondsString = "";
+
+        if (hours < 10) {
+            hoursString = "0";
+        }
+        if (minutes < 10) {
+            minutesString = "0";
+        }
+        if (seconds < 10) {
+            secondsString = "0";
+        }
+        hoursString += hours;
+        minutesString += minutes;
+        secondsString += seconds;
+
+        try {
+            writer.write ("|" + participant + " TOTALS:      |" + activityName);
+            for (int i = (19 - (19 - (activityName.length()))); i < 19; i++) {
+                writer.write(" ");
+            }
+            writer.write ("|" + hoursString + ":" + minutesString + ":" + secondsString + "|\n");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }  
 }
