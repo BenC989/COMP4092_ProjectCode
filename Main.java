@@ -9,7 +9,7 @@ public class Main {
     // Create the lists of records
     static ArrayList<ImageRecord> imageTableRecords = new ArrayList<>();
     static ArrayList<ActivityRecord> activityTableRecords = new ArrayList<>();
-    static ArrayList<ImageRecord> preselectedRepresenativeImages = new ArrayList<>();
+    static ArrayList<String> preselectedRepresenativeImages = new ArrayList<>();
 
     // Create a file writer for the data output
     static FileWriter writer;
@@ -40,7 +40,8 @@ public class Main {
          * 1. Calculate duration for participant activities
          * 2. Record the data 
          * 3. Write all Activity Table records to text file
-         * 4. Repeat for all participants
+         * 4. Write the combined total activity duration for all activity classes
+         * 5. Repeat for all participants
          */ 
         int numberOfParticipants = Integer.valueOf(imageTableRecords.get(imageTableRecords.size()-1).participantID);
         for (int i = 1; i <= numberOfParticipants; i++) {
@@ -49,8 +50,14 @@ public class Main {
                 ID = "0";
             }
             ID += String.valueOf(i);
+
+            // Calculate duration for participant activities
             participantActivities(writer, ID, imageTableRecords);
+
+            // Write all Activity Table records to text file
             fillActivityTable(writer);
+
+            // Write the combined total activity duration for all activity classes
             participantActivitiesTotalDuration(writer, ID, activityTableRecords);
         }
 
@@ -75,7 +82,7 @@ public class Main {
         // Iterate through all activity classes
         for (int i = 0; i < activityClasses.length; i++) { 
 
-            // Do not look through the Representative Images folder
+            // Ignore the Representative Images folder
             if ((activityClasses[i].getName().equals("Representative Images")) == false) {
                 File[] activityClass = activityClasses[i].listFiles();
 
@@ -146,21 +153,25 @@ public class Main {
                     }
                 }
             }
-            // Get all representative image records
+
+            // Look through the Representative Images folder
             else {
                 File[] repImageActivityClasses = activityClasses[i].listFiles();
                 for (int j = 0; j < repImageActivityClasses.length; j++) {
+
                     File[] repImageParticipants = repImageActivityClasses[j].listFiles();
                     for (int k = 0; k < repImageParticipants.length; k++) {
+
                         File[] repImageParticipantFiles = repImageParticipants[k].listFiles();
                         if (repImageParticipantFiles != null) {
+
                             for (int l = 0; l < repImageParticipantFiles.length; l++) {
+
                                 String fileName = repImageParticipantFiles[l].getName();
                                 if (fileName.startsWith("PSS")) {
-                                    String sortingVariable = "";
-                                    ImageRecord record = new ImageRecord(sortingVariable);
-                                    record.fileName = fileName;
-                                    preselectedRepresenativeImages.add(record);
+
+                                    // Add every "preselected image" to a set of records
+                                    preselectedRepresenativeImages.add(fileName);
                                 }
                             }
                         }
@@ -178,7 +189,8 @@ public class Main {
     }
 
     /*
-     * This function considers one participant and calculates the time duration for each of their activities
+     * This function considers one participant only. For this participant, the function
+     * calculates the time duration and defines a representative image for each of their activities 
      */
     public static ArrayList<ActivityRecord> participantActivities(Writer writer, String participant, ArrayList<ImageRecord> tableRecords) {
 
@@ -203,10 +215,14 @@ public class Main {
             // Update loop guard
             inBounds = ((index + 1) != tableRecords.size());
             foundParticipant = (tableRecords.get(index).participantID.equals(participant));
+
+            // Case where the end of the image records is reached
             if (inBounds == false) {
                 nextActivitySame = false;
                 nextParticipantSame = false;
             }
+
+            // Check whether the next activity is the same and the next participant is the same
             else {
                 nextActivitySame = (tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity);
                 nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
@@ -231,9 +247,14 @@ public class Main {
                 newActivity = false;
             }
 
+            /*
+             * If an activity has an associated image in the Representative Images folder, use that
+             * image instead of the middle image
+             */ 
+
             if (foundBetterImage == false) {
                 for (int i = 0; i < preselectedRepresenativeImages.size(); i++) {
-                    if (tableRecords.get(index).fileName.equals(preselectedRepresenativeImages.get(i).fileName)) {
+                    if (tableRecords.get(index).fileName.equals(preselectedRepresenativeImages.get(i))) {
                         foundBetterImage = true;
                         activity.representative = tableRecords.get(index).fileName;
                     }
@@ -243,10 +264,15 @@ public class Main {
             // When it's the end of an activity, record end date/time
             if ((inBounds == false) || (nextActivitySame == false) || (nextParticipantSame == false)) {
 
+                /*
+                 * If there is no preselected representative image for this specific activity, then
+                 * use the image from the middle of the activity as the representative
+                 */
                 if (foundBetterImage == false) {
                     activity.representative = tableRecords.get(index - (representativeImageIndex / 2)).fileName;
                 }
 
+                // Record the end date and time
                 if ((inBounds == false) || (nextParticipantSame == false)) {
                     activity.endDay = tableRecords.get(index).day;
                     activity.endMonth = tableRecords.get(index).month;
@@ -315,10 +341,14 @@ public class Main {
             // Update loop guard
             inBounds = ((index + 1) != tableRecords.size());
             foundParticipant = (tableRecords.get(index).participantID.equals(participant));
+
+            // Case where the end of the image records is reached
             if (inBounds == false) {
                 nextActivitySame = false;
                 nextParticipantSame = false;
             }
+
+            // Check whether the next activity is the same and the next participant is the same
             else {
                 nextActivitySame = (tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity);
                 nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
@@ -454,6 +484,74 @@ public class Main {
         answer[3] = second;
         return answer;
     }
+
+    /*
+     * This function writes the combined total activity duration for every activity class
+     */
+    public static void participantActivitiesTotalDuration(Writer writer, String participant, ArrayList<ActivityRecord> tableRecords) {
+        participantActivityTotalDuration(writer, participant, tableRecords, "Socializing");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Electronic Devices");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Food Related");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Managing Health");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Indoor");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Deliberate Exercise");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Driving");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Shopping");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Sleeping");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Watching TV");
+    }
+
+    /*
+     * This function writes the combined total activity duration for one specific activity class
+     */
+    public static void participantActivityTotalDuration(Writer writer, String participant, ArrayList<ActivityRecord> tableRecords, String activityName) {
+        int durationInSeconds = 0;
+
+        // Iterate through each activity record and sum the duration for the specific activity class
+        for (ActivityRecord i : activityTableRecords) {
+            if (i.name.equals(activityName)) {
+                durationInSeconds += (Integer.parseInt(i.durationHours) * 3600);
+                durationInSeconds += (Integer.parseInt(i.durationMinutes) * 60);
+                durationInSeconds += (Integer.parseInt(i.durationSeconds));
+            }
+        }
+
+        // Convert seconds to hours, minutes, and seconds
+        int hours = durationInSeconds / 3600;
+        durationInSeconds = durationInSeconds % 3600;
+        int minutes = durationInSeconds / 60;
+        durationInSeconds = durationInSeconds % 60;
+        int seconds = durationInSeconds;
+        
+        // Format for presentation
+        String hoursString = "";
+        String minutesString = "";
+        String secondsString = "";
+        if (hours < 10) {
+            hoursString = "0";
+        }
+        if (minutes < 10) {
+            minutesString = "0";
+        }
+        if (seconds < 10) {
+            secondsString = "0";
+        }
+        hoursString += hours;
+        minutesString += minutes;
+        secondsString += seconds;
+
+        // Write the combined duration for the activity class
+        try {
+            writer.write ("|" + participant + " TOTALS:      |" + activityName);
+            for (int i = (19 - (19 - (activityName.length()))); i < 19; i++) {
+                writer.write(" ");
+            }
+            writer.write ("|" + hoursString + ":" + minutesString + ":" + secondsString + "|\n");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
+    }  
 
     /*
      * This function writes the ImageID data in the Image Table in the data storage file
@@ -679,6 +777,9 @@ public class Main {
         }
     }
 
+    /*
+     * This function writes the representative image in the Activity Table in the data storage file
+     */
     public static void writeActivityTableRepresentative(Writer writer, ActivityRecord activity) {
         try {
             writer.write(activity.representative + "|\n");
@@ -687,62 +788,4 @@ public class Main {
             System.err.println("Error! " + e.getMessage()); 
         }
     }
-
-    public static void participantActivitiesTotalDuration(Writer writer, String participant, ArrayList<ActivityRecord> tableRecords) {
-        participantActivityTotalDuration(writer, participant, tableRecords, "Socializing");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Electronic Devices");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Food Related");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Managing Health");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Indoor");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Deliberate Exercise");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Driving");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Shopping");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Sleeping");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Watching TV");
-    }
-
-    public static void participantActivityTotalDuration(Writer writer, String participant, ArrayList<ActivityRecord> tableRecords, String activityName) {
-        int durationInSeconds = 0;
-
-        for (ActivityRecord i : activityTableRecords) {
-            if (i.name.equals(activityName)) {
-                durationInSeconds += (Integer.parseInt(i.durationHours) * 3600);
-                durationInSeconds += (Integer.parseInt(i.durationMinutes) * 60);
-                durationInSeconds += (Integer.parseInt(i.durationSeconds));
-            }
-        }
-        int hours = durationInSeconds / 3600;
-        durationInSeconds = durationInSeconds % 3600;
-        int minutes = durationInSeconds / 60;
-        durationInSeconds = durationInSeconds % 60;
-        int seconds = durationInSeconds;
-        
-        String hoursString = "";
-        String minutesString = "";
-        String secondsString = "";
-
-        if (hours < 10) {
-            hoursString = "0";
-        }
-        if (minutes < 10) {
-            minutesString = "0";
-        }
-        if (seconds < 10) {
-            secondsString = "0";
-        }
-        hoursString += hours;
-        minutesString += minutes;
-        secondsString += seconds;
-
-        try {
-            writer.write ("|" + participant + " TOTALS:      |" + activityName);
-            for (int i = (19 - (19 - (activityName.length()))); i < 19; i++) {
-                writer.write(" ");
-            }
-            writer.write ("|" + hoursString + ":" + minutesString + ":" + secondsString + "|\n");
-        }
-        catch (Exception e) {
-            System.err.println("Error! " + e.getMessage()); 
-        }
-    }  
 }
