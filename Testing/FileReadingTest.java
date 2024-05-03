@@ -9,6 +9,7 @@ public class FileReadingTest {
     // Create the lists of records
     static ArrayList<ImageRecord> imageTableRecords = new ArrayList<>();
     static ArrayList<ActivityRecord> activityTableRecords = new ArrayList<>();
+    static ArrayList<ImageRecord> preselectedRepresenativeImages = new ArrayList<>();
 
     // Create a file writer for the data output
     static FileWriter writer;
@@ -144,6 +145,27 @@ public class FileReadingTest {
                     }
                 }
             }
+            // Get all representative image records
+            else {
+                File[] repImageActivityClasses = activityClasses[i].listFiles();
+                for (int j = 0; j < repImageActivityClasses.length; j++) {
+                    File[] repImageParticipants = repImageActivityClasses[j].listFiles();
+                    for (int k = 0; k < repImageParticipants.length; k++) {
+                        File[] repImageParticipantFiles = repImageParticipants[k].listFiles();
+                        if (repImageParticipantFiles != null) {
+                            for (int l = 0; l < repImageParticipantFiles.length; l++) {
+                                String fileName = repImageParticipantFiles[l].getName();
+                                if (fileName.startsWith("PSS")) {
+                                    String sortingVariable = "";
+                                    ImageRecord record = new ImageRecord(sortingVariable);
+                                    record.fileName = fileName;
+                                    preselectedRepresenativeImages.add(record);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -171,6 +193,7 @@ public class FileReadingTest {
         boolean nextActivitySame = (tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity);
         boolean nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
         int representativeImageIndex = 1;
+        boolean foundBetterImage = false;
 
         // Search the list of Image records until the correct participant is found
         while ((inBounds == true) && (foundParticipant) == false) {
@@ -203,13 +226,25 @@ public class FileReadingTest {
                 activity.startHour = tableRecords.get(index).hour;
                 activity.startMinute = tableRecords.get(index).minute;
                 activity.startSecond = tableRecords.get(index).second;
+                foundBetterImage = false;
                 newActivity = false;
+            }
+
+            if (foundBetterImage == false) {
+                for (int i = 0; i < preselectedRepresenativeImages.size(); i++) {
+                    if (tableRecords.get(index).fileName.equals(preselectedRepresenativeImages.get(i).fileName)) {
+                        foundBetterImage = true;
+                        activity.representative = tableRecords.get(index).fileName;
+                    }
+                }
             }
 
             // When it's the end of an activity, record end date/time
             if ((inBounds == false) || (nextActivitySame == false) || (nextParticipantSame == false)) {
 
-                activity.representative = tableRecords.get(index - (representativeImageIndex / 2)).fileName;
+                if (foundBetterImage == false) {
+                    activity.representative = tableRecords.get(index - (representativeImageIndex / 2)).fileName;
+                }
 
                 if ((inBounds == false) || (nextParticipantSame == false)) {
                     activity.endDay = tableRecords.get(index).day;
