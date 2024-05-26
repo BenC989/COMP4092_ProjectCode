@@ -4,7 +4,7 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 
-public class Main {
+public class ExcelTest {
 
     // Create the lists of records
     static ArrayList<ImageRecord> imageTableRecords = new ArrayList<>();
@@ -21,7 +21,7 @@ public class Main {
 
         // Initialise the file writer
         try {
-            writer = new FileWriter("Data_Storage.txt");
+            writer = new FileWriter("Data_Storage.xls");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -34,7 +34,7 @@ public class Main {
         sortImageTable(imageTableRecords);
 
         // Write all Image Table records to text file
-        fillImageTable(writer);
+        //fillImageTable(writer);
 
         /*
          * 1. Calculate duration for participant activities
@@ -58,7 +58,7 @@ public class Main {
             fillActivityTable(writer);
 
             // Write the combined total activity duration for all activity classes
-            participantActivitiesTotalDuration(writer, ID, activityTableRecords);
+            //participantActivitiesTotalDuration(writer, ID, activityTableRecords);
         }
 
         // Close the file writer
@@ -398,15 +398,20 @@ public class Main {
     public static void fillActivityTable(Writer writer) {
         try {
             // Write the Activity Table headings
-            writer.write("|----------------|-------------------|---------------------|");
-            writer.write("---------------------|------------|-----------------------------------|");
-            writer.write("--------------|");
-            writer.write("\n");
-            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |   Representative Image File Name  |   Location   |");
-            writer.write("\n");
-            writer.write("|----------------|-------------------|---------------------|");
-            writer.write("---------------------|------------|-----------------------------------|");
-            writer.write("--------------|");
+            writer.append("Participant ID");
+            writer.append("\t");
+            writer.append("Activity Class");
+            writer.append("\t");
+            writer.append("Start Date / Time");
+            writer.append("\t");
+            writer.append("End Date / Time");
+            writer.append("\t");
+            writer.append("Duration");
+            writer.append("\t");
+            writer.append("Representative Image File Name");
+            writer.append("\t");
+            writer.append("Location");
+            writer.append("\t");
             writer.write("\n");
 
             // Write the Activity Table records
@@ -420,9 +425,6 @@ public class Main {
             }
 
             // Complete the table
-            writer.write("|----------------|-------------------|---------------------|");
-            writer.write("---------------------|------------|-----------------------------------|");
-            writer.write("--------------|");
             writer.write("\n");
         }
         catch (Exception e) {
@@ -684,8 +686,8 @@ public class Main {
      */
     public static void writeActivityTableParticipantID(Writer writer, String participantID) {
         try {
-            writer.write("|" + participantID);
-            writer.write("              |");
+            writer.write(participantID);
+            writer.write("\t");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -698,10 +700,7 @@ public class Main {
     public static void writeActivityTableActivity(Writer writer, String activity) {
         try {
             writer.write(activity);
-            for (int l = (19-(19-(activity.length()))); l < 19; l++) {
-                writer.write(" ");
-            }
-            writer.write("|");
+            writer.append("\t");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -724,7 +723,7 @@ public class Main {
             writer.write(activity.startMinute);
             writer.write(":");
             writer.write(activity.startSecond);
-            writer.write("|");
+            writer.append("\t");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -747,7 +746,7 @@ public class Main {
             writer.write(activity.endMinute);
             writer.write(":");
             writer.write(activity.endSecond);
-            writer.write("|");
+            writer.append("\t");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -776,7 +775,7 @@ public class Main {
             answer += activity.durationSeconds;
 
             writer.write(answer);
-            writer.write("    |");
+            writer.append("\t");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -788,7 +787,7 @@ public class Main {
      */
     public static void writeActivityTableRepresentative(Writer writer, ActivityRecord activity) {
         try {
-            writer.write(activity.representative + "|\n");
+            writer.write(activity.representative + "\n");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
