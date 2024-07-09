@@ -87,10 +87,16 @@ public class ExcelTest {
                 File[] activityClass = activityClasses[i].listFiles();
 
                 // Only consider folders that have the "Processed" sub-folder
-                if (activityClass != null && activityClass.length > 3) {
+                if (activityClass != null && activityClass.length >= 3) {
 
                     // Only look at files from the "Processed" folder
-                    File processed = activityClass[3];
+                    File processed = null;
+                    if (activityClass.length > 3) {
+                        processed = activityClass[3];
+                    }
+                    else {
+                        processed = activityClass[2];
+                    }
 
                     // Search through the activity folder
                     File[] processedSubFolders = processed.listFiles();
@@ -111,7 +117,8 @@ public class ExcelTest {
                                 String fileName = images[k].getName();
 
                                 // Ensure that the type of file is correct
-                                if (fileName.startsWith("PSS")) {
+                                if (fileName.startsWith("PSS")
+                                    && (fileName.contains("Copy") == false)) {
 
                                     // Extract all timestamp data from image
                                     String year = fileName.substring(4, 8);
