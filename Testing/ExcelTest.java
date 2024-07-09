@@ -100,60 +100,62 @@ public class ExcelTest {
 
                     // Search through the activity folder
                     File[] processedSubFolders = processed.listFiles();
-                    File activityName = processedSubFolders[0];
-                    if (activityName.getName().equals(".DS_Store")) {
-                        activityName = processedSubFolders[1];
-                    }
+                    for (int index = 0; index < processedSubFolders.length; index++) {
+                    
+                        File activityName = processedSubFolders[index];
+                        if ((activityName.getName().equals(".DS_Store")) == false) {
+                            
+                            // Iterate through all participants
+                            File[] participants = activityName.listFiles();
+                            for (int j = 0; j < participants.length; j++) { 
 
-                    // Iterate through all participants
-                    File[] participants = activityName.listFiles();
-                    for (int j = 0; j < participants.length; j++) { 
+                                File[] images = participants[j].listFiles();
 
-                        File[] images = participants[j].listFiles();
+                                // Iterate through each participant's image files
+                                if (images != null) {
+                                    for (int k = 0; k < images.length; k++) { 
+                                        String fileName = images[k].getName();
 
-                        // Iterate through each participant's image files
-                        if (images != null) {
-                            for (int k = 0; k < images.length; k++) { 
-                                String fileName = images[k].getName();
+                                        // Ensure that the type of file is correct
+                                        if (fileName.startsWith("PSS")
+                                            && (fileName.contains("Copy") == false)) {
 
-                                // Ensure that the type of file is correct
-                                if (fileName.startsWith("PSS")
-                                    && (fileName.contains("Copy") == false)) {
+                                            // Extract all timestamp data from image
+                                            String year = fileName.substring(4, 8);
+                                            String month = fileName.substring(8, 10);
+                                            String day = fileName.substring(10, 12);
+                                            String hour = fileName.substring(13, 15);
+                                            String minute = fileName.substring(15, 17);
+                                            String second = fileName.substring(17, 19);
 
-                                    // Extract all timestamp data from image
-                                    String year = fileName.substring(4, 8);
-                                    String month = fileName.substring(8, 10);
-                                    String day = fileName.substring(10, 12);
-                                    String hour = fileName.substring(13, 15);
-                                    String minute = fileName.substring(15, 17);
-                                    String second = fileName.substring(17, 19);
+                                            // Get other image information
+                                            String imageID = fileName.substring(28, 31);
+                                            String participantID = participants[j].getName();
+                                            String activity = activityName.getName();
 
-                                    // Get other image information
-                                    String imageID = fileName.substring(28, 31);
-                                    String participantID = participants[j].getName();
-                                    String activity = activityName.getName();
+                                            // Adjust timestamp information
+                                            String[] adjustedTimestamp = adjustTimestamp(imageID, day, hour, minute, second);
+                                            day = adjustedTimestamp[0];
+                                            hour = adjustedTimestamp[1];
+                                            minute = adjustedTimestamp[2];
+                                            second = adjustedTimestamp[3];
 
-                                    // Adjust timestamp information
-                                    String[] adjustedTimestamp = adjustTimestamp(imageID, day, hour, minute, second);
-                                    day = adjustedTimestamp[0];
-                                    hour = adjustedTimestamp[1];
-                                    minute = adjustedTimestamp[2];
-                                    second = adjustedTimestamp[3];
-
-                                    // Add this image information to the table records
-                                    String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
-                                    ImageRecord record = new ImageRecord(sortingVariable);
-                                    record.fileName = fileName;
-                                    record.imageID = imageID;
-                                    record.participantID = participantID;
-                                    record.day = day;
-                                    record.month = month;
-                                    record.year = year;
-                                    record.hour = hour;
-                                    record.minute = minute;
-                                    record.second = second;
-                                    record.activity = activity;
-                                    imageTableRecords.add(record);
+                                            // Add this image information to the table records
+                                            String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
+                                            ImageRecord record = new ImageRecord(sortingVariable);
+                                            record.fileName = fileName;
+                                            record.imageID = imageID;
+                                            record.participantID = participantID;
+                                            record.day = day;
+                                            record.month = month;
+                                            record.year = year;
+                                            record.hour = hour;
+                                            record.minute = minute;
+                                            record.second = second;
+                                            record.activity = activity;
+                                            imageTableRecords.add(record);
+                                        }
+                                    }
                                 }
                             }
                         }
