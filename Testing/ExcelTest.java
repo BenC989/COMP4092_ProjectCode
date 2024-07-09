@@ -33,6 +33,9 @@ public class ExcelTest {
         // Sort the data in chronological order for each participant
         sortImageTable(imageTableRecords);
 
+        // Remove duplicate data
+        removeDuplicates(imageTableRecords);
+
         // Write all Image Table records to text file
         //fillImageTable(writer);
 
@@ -195,6 +198,15 @@ public class ExcelTest {
      */
     public static void sortImageTable(ArrayList<ImageRecord> list) {
         list.sort((record1, record2) -> record1.getSortingVariable().compareTo(record2.getSortingVariable()));
+    }
+
+    public static void removeDuplicates(ArrayList<ImageRecord> tableRecords) {
+        for (int i = 0; i < tableRecords.size() - 1; i++) {
+            if ((tableRecords.get(i+1).fileName).equals(tableRecords.get(i).fileName)) {
+                tableRecords.remove(i+1);
+            }
+        }
+        imageTableRecords = tableRecords;
     }
 
     /*
