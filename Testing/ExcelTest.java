@@ -457,11 +457,6 @@ public class ExcelTest {
      * This function adjusts the timestamp to ensure data correctness
      */
     public static String[] adjustTimestamp(String imageID, String day, String hour, String minute, String second) {
-
-
-        /*
-         * THE PROBLEM IS PROBABLY THE TIMESTAMP FUNCTION. IT COULD BE CAUSING THE 60-SECOND PROBLEM
-         */
         
         // Define variables
         int intImageID = Integer.valueOf(imageID);
