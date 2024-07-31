@@ -3,6 +3,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.*;
 
 public class Main {
 
@@ -10,6 +14,7 @@ public class Main {
     static ArrayList<ImageRecord> imageTableRecords = new ArrayList<>();
     static ArrayList<ActivityRecord> activityTableRecords = new ArrayList<>();
     static ArrayList<String> preselectedRepresenativeImages = new ArrayList<>();
+    static int currentYPosition = 20;
 
     // Create a file writer for the data output
     static FileWriter writer;
@@ -33,7 +38,7 @@ public class Main {
         // Sort the data in chronological order for each participant
         sortImageTable(imageTableRecords);
 
-        // Remove duplicate data
+        // Remove duplicate image records
         removeDuplicates(imageTableRecords);
 
         // Write all Image Table records to text file
@@ -47,7 +52,7 @@ public class Main {
          * 5. Repeat for all participants
          */ 
         int numberOfParticipants = Integer.valueOf(imageTableRecords.get(imageTableRecords.size()-1).participantID);
-        for (int i = 1; i <= numberOfParticipants; i++) {
+        for (int i = 25; i <= 25; i++) {
             String ID = "";
             if (i < 10) {
                 ID = "0";
@@ -132,6 +137,7 @@ public class Main {
                                             String second = fileName.substring(17, 19);
 
                                             // Get other image information
+                                            File file = images[k];
                                             String imageID = fileName.substring(28, 31);
                                             String participantID = participants[j].getName();
                                             String activity = activityName.getName();
@@ -147,6 +153,7 @@ public class Main {
                                             String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
                                             ImageRecord record = new ImageRecord(sortingVariable);
                                             record.fileName = fileName;
+                                            record.file = file;
                                             record.imageID = imageID;
                                             record.participantID = participantID;
                                             record.day = day;
@@ -348,6 +355,16 @@ public class Main {
                 // Add this record to the participant's activity list
                 activityTableRecords.add(activity);
 
+                // Add this record to the participant's data visualisation file
+                try {
+                    BufferedImage participantFile = ImageIO.read(new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\output_image.png"));
+                    BufferedImage representativeImage = ImageIO.read(tableRecords.get(index - (representativeImageIndex / 2)).file);
+                    String startTime = activity.startHour + ":" + activity.startMinute + ":" + activity.startSecond;
+                    String endTime = activity.endHour + ":" + activity.endMinute + ":" + activity.endSecond;
+                    addVisualisationEntry(participantFile, representativeImage, startTime, endTime);
+                }
+                catch (Exception e) {}
+
                 // Identify that a new activity has begun
                 if (inBounds == true) {
                     activity = new ActivityRecord();
@@ -522,11 +539,12 @@ public class Main {
         participantActivityTotalDuration(writer, participant, tableRecords, "Food Related");
         participantActivityTotalDuration(writer, participant, tableRecords, "Managing Health");
         participantActivityTotalDuration(writer, participant, tableRecords, "Indoor");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Outdoor");
         participantActivityTotalDuration(writer, participant, tableRecords, "Deliberate Exercise");
         participantActivityTotalDuration(writer, participant, tableRecords, "Driving");
         participantActivityTotalDuration(writer, participant, tableRecords, "Shopping");
         participantActivityTotalDuration(writer, participant, tableRecords, "Sleeping");
-        participantActivityTotalDuration(writer, participant, tableRecords, "Watching TV");
+        participantActivityTotalDuration(writer, participant, tableRecords, "Watching Tv");
     }
 
     /*
@@ -814,6 +832,42 @@ public class Main {
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
+        }
+    }
+
+    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage overlayImage, String startTime, String endTime) {
+        try {
+            Graphics2D g2d = participantFile.createGraphics();
+            
+            // Calculate and define size and position for overlay image
+            double scaleFactor = 0.3; 
+            int overlayWidth = (int) (overlayImage.getWidth() * scaleFactor);
+            int overlayHeight = (int) (overlayImage.getHeight() * scaleFactor);
+            int x = 110; 
+            int y = currentYPosition; 
+
+            // Draw the overlay image
+            g2d.drawImage(overlayImage, x, y, overlayWidth, overlayHeight, null);
+            currentYPosition += 120;
+
+            // Draw the date and time text
+            Font font = new Font("Arial", Font.BOLD, 10); 
+            g2d.setFont(font);
+            g2d.setColor(Color.BLACK); 
+            g2d.drawString(startTime, x - 50, y);
+            g2d.drawString(endTime, x - 50, y + 120);
+
+            // Draw the location text
+            g2d.drawString("LOCATION", x + 200, y + 65);
+            g2d.dispose();
+
+            // Save the changes to the file
+            File outputfile = new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\output_image.png");
+            ImageIO.write(participantFile, "png", outputfile);
+
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,5 +1,7 @@
+import java.io.File;
 public class ImageRecord {
     String fileName;
+    File file;
     String imageID;
     String participantID;
     String year;
