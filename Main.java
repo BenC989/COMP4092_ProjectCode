@@ -14,10 +14,12 @@ public class Main {
     static ArrayList<ImageRecord> imageTableRecords = new ArrayList<>();
     static ArrayList<ActivityRecord> activityTableRecords = new ArrayList<>();
     static ArrayList<String> preselectedRepresenativeImages = new ArrayList<>();
-    static int currentYPosition = 20;
 
     // Create a file writer for the data output
     static FileWriter writer;
+
+    // Define other global variables
+    static int currentYPosition;
 
     /*
      * This is the main function used to execute the entire program
@@ -52,7 +54,7 @@ public class Main {
          * 5. Repeat for all participants
          */ 
         int numberOfParticipants = Integer.valueOf(imageTableRecords.get(imageTableRecords.size()-1).participantID);
-        for (int i = 25; i <= 25; i++) {
+        for (int i = 15; i <= numberOfParticipants; i++) {
             String ID = "";
             if (i < 10) {
                 ID = "0";
@@ -60,6 +62,7 @@ public class Main {
             ID += String.valueOf(i);
 
             // Calculate duration for participant activities
+            currentYPosition = 60;
             participantActivities(writer, ID, imageTableRecords);
 
             // Write all Activity Table records to text file
@@ -357,11 +360,11 @@ public class Main {
 
                 // Add this record to the participant's data visualisation file
                 try {
-                    BufferedImage participantFile = ImageIO.read(new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\output_image.png"));
+                    BufferedImage participantFile = ImageIO.read(new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\" + participant + ".png"));
                     BufferedImage representativeImage = ImageIO.read(tableRecords.get(index - (representativeImageIndex / 2)).file);
-                    String startTime = activity.startHour + ":" + activity.startMinute + ":" + activity.startSecond;
-                    String endTime = activity.endHour + ":" + activity.endMinute + ":" + activity.endSecond;
-                    addVisualisationEntry(participantFile, representativeImage, startTime, endTime);
+                    String startTime = activity.startDay + "/" + activity.startMonth + "/" + activity.startYear + ", " + activity.startHour + ":" + activity.startMinute + ":" + activity.startSecond;
+                    String endTime = activity.endDay + "/" + activity.endMonth + "/" + activity.endYear + ", " + activity.endHour + ":" + activity.endMinute + ":" + activity.endSecond;
+                    addVisualisationEntry(participantFile, representativeImage, startTime, endTime, participant);
                 }
                 catch (Exception e) {}
 
@@ -835,14 +838,22 @@ public class Main {
         }
     }
 
-    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage overlayImage, String startTime, String endTime) {
+    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage overlayImage, String startTime, String endTime, String participant) {
         try {
             Graphics2D g2d = participantFile.createGraphics();
+
+            // Define font and draw participant text
+            Font headingFont = new Font("Arial", Font.BOLD, 20);
+            Font timeFont = new Font("Arial", Font.BOLD, 10); 
+            Font locationFont = new Font("Arial", Font.BOLD, 10);
+            g2d.setFont(headingFont);
+            g2d.setColor(Color.BLACK); 
+            g2d.drawString("Participant " + participant, 140, 30);
             
             // Calculate and define size and position for overlay image
-            double scaleFactor = 0.3; 
-            int overlayWidth = (int) (overlayImage.getWidth() * scaleFactor);
-            int overlayHeight = (int) (overlayImage.getHeight() * scaleFactor);
+            double scale = 0.3; 
+            int overlayWidth = (int) (overlayImage.getWidth() * scale);
+            int overlayHeight = (int) (overlayImage.getHeight() * scale);
             int x = 110; 
             int y = currentYPosition; 
 
@@ -851,20 +862,19 @@ public class Main {
             currentYPosition += 120;
 
             // Draw the date and time text
-            Font font = new Font("Arial", Font.BOLD, 10); 
-            g2d.setFont(font);
-            g2d.setColor(Color.BLACK); 
-            g2d.drawString(startTime, x - 50, y);
-            g2d.drawString(endTime, x - 50, y + 120);
+            g2d.setFont(timeFont);
+            g2d.drawString(startTime, x - 105, y);
+            g2d.drawString(endTime, x - 105, y + 120);
 
             // Draw the location text
+            g2d.setFont(locationFont);
             g2d.drawString("LOCATION", x + 200, y + 65);
             g2d.dispose();
 
             // Save the changes to the file
-            File outputfile = new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\output_image.png");
+            File outputfile = new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\" + participant + ".png");
             ImageIO.write(participantFile, "png", outputfile);
-
+            System.out.println("doing participant " + participant);
         } 
         catch (IOException e) {
             e.printStackTrace();
