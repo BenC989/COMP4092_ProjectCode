@@ -1,14 +1,13 @@
 // Import all required libraries
 import java.io.File;
+import java.awt.image.BufferedImage;
+import java.awt.*;
+import javax.imageio.ImageIO;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -20,7 +19,7 @@ public class Main {
     // Create a file writer for the data output
     static FileWriter writer;
 
-    // Define other global variables
+    // Define Y-position to draw images
     static int currentYPosition;
 
     /*
@@ -52,7 +51,7 @@ public class Main {
          * 1. Calculate duration for participant activities
          * 2. Record the data 
          * 3. Write all Activity Table records to text file
-         * 4. Write the combined total activity duration for all activity classes
+         * 4. Write the combined total activity duration for all types of activity classes
          * 5. Repeat for all participants
          */ 
         int numberOfParticipants = Integer.valueOf(imageTableRecords.get(imageTableRecords.size()-1).participantID);
@@ -63,14 +62,14 @@ public class Main {
             }
             ID += String.valueOf(i);
 
-            // Calculate duration for participant activities
+            // Define participant activities
             currentYPosition = 60;
             participantActivities(writer, ID, imageTableRecords);
 
             // Write all Activity Table records to text file
             fillActivityTable(writer);
 
-            // Write the combined total activity duration for all activity classes
+            // Write the combined total activity duration for all types of activity classes
             participantActivitiesTotalDuration(writer, ID, activityTableRecords);
         }
 
@@ -141,20 +140,20 @@ public class Main {
                                             String minute = fileName.substring(15, 17);
                                             String second = fileName.substring(17, 19);
 
-                                            // Get other image information
+                                            // Get other image data
                                             File file = images[k];
                                             String imageID = fileName.substring(28, 31);
                                             String participantID = participants[j].getName();
                                             String activity = activityName.getName();
 
-                                            // Adjust timestamp information
+                                            // Adjust timestamp data
                                             String[] adjustedTimestamp = adjustTimestamp(imageID, day, hour, minute, second);
                                             day = adjustedTimestamp[0];
                                             hour = adjustedTimestamp[1];
                                             minute = adjustedTimestamp[2];
                                             second = adjustedTimestamp[3];
 
-                                            // Add this image information to the table records
+                                            // Add this image data to the Image table records
                                             String sortingVariable = participantID + year + month + day + hour + minute + second + imageID;
                                             ImageRecord record = new ImageRecord(sortingVariable);
                                             record.fileName = fileName;
@@ -212,6 +211,9 @@ public class Main {
         list.sort((record1, record2) -> record1.getSortingVariable().compareTo(record2.getSortingVariable()));
     }
 
+    /*
+     * This function removes all duplicate image records found in the Image table
+     */
     public static void removeDuplicates(ArrayList<ImageRecord> tableRecords) {
         for (int i = 0; i < tableRecords.size() - 1; i++) {
             if ((tableRecords.get(i+1).fileName).equals(tableRecords.get(i).fileName)) {
@@ -222,15 +224,16 @@ public class Main {
     }
 
     /*
-     * This function considers one participant only. For this participant, the function
-     * calculates the time duration and defines a representative image for each of their activities 
+     * This function considers one participant only. For this participant, the function defines their
+     * activities. It calculates the time duration and defines a representative image for each 
+     * of their activities 
      */
     public static ArrayList<ActivityRecord> participantActivities(Writer writer, String participant, ArrayList<ImageRecord> tableRecords) {
 
         // Store the participant's activities
         activityTableRecords = new ArrayList<>();
 
-        // Define variables
+        // Define required variables
         int index = 0;
         boolean newActivity = true;
         ActivityRecord activity = new ActivityRecord();
@@ -543,7 +546,7 @@ public class Main {
     }
 
     /*
-     * This function writes the combined total activity duration for every activity class
+     * This function writes the combined total activity duration for every type of activity class
      */
     public static void participantActivitiesTotalDuration(Writer writer, String participant, ArrayList<ActivityRecord> tableRecords) {
         participantActivityTotalDuration(writer, participant, tableRecords, "Socializing");
@@ -847,6 +850,9 @@ public class Main {
         }
     }
 
+    /*
+     * This function writes the location in the Activity Table in the data storage file
+     */
     public static void writeActivityTableLocation(Writer writer, ActivityRecord activity) {
         try {
             if (activity.location == null) {
@@ -863,19 +869,23 @@ public class Main {
         }
     }
 
-    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage overlayImage, String startTime, String endTime, String location, String participant) {
+    /*
+     * This function visualises participant activity data, printing text and a representative
+     * image onto a png file to show the time and location of a participant's activities
+     */
+    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage repImage, String startTime, String endTime, String location, String participant) {
         try {
-            Graphics2D g2d = participantFile.createGraphics();
+            Graphics2D graphics = participantFile.createGraphics();
 
-            // Define font and draw participant text
+            // Define font and draw heading participant text
             Font headingFont = new Font("Arial", Font.BOLD, 20);
             Font timeFont = new Font("Arial", Font.BOLD, 10); 
             Font locationFont = new Font("Arial", Font.BOLD, 10);
-            g2d.setFont(headingFont);
-            g2d.setColor(Color.BLACK); 
-            g2d.drawString("Participant " + participant, 140, 30);
+            graphics.setFont(headingFont);
+            graphics.setColor(Color.BLACK); 
+            graphics.drawString("Participant " + participant, 140, 30);
             
-            // Calculate and define size and position for overlay image
+            // Calculate and define size and position for representative image
             double scale;
             if (participant.equals("15")
              || participant.equals("16")
@@ -886,39 +896,43 @@ public class Main {
             else {
                 scale = 0.3; 
             }
-            int overlayWidth = (int) (overlayImage.getWidth() * scale);
-            int overlayHeight = (int) (overlayImage.getHeight() * scale);
+            int repImageWidth = (int) (repImage.getWidth() * scale);
+            int repImageHeight = (int) (repImage.getHeight() * scale);
             int x = 110; 
             int y = currentYPosition; 
 
-            // Draw the overlay image
-            g2d.drawImage(overlayImage, x, y, overlayWidth, overlayHeight, null);
+            // Draw the representative image
+            graphics.drawImage(repImage, x, y, repImageWidth, repImageHeight, null);
             currentYPosition += 120;
 
             // Draw the date and time text
-            g2d.setFont(timeFont);
-            g2d.drawString(startTime, x - 105, y);
-            g2d.drawString(endTime, x - 105, y + 120);
+            graphics.setFont(timeFont);
+            graphics.drawString(startTime, x - 105, y);
+            graphics.drawString(endTime, x - 105, y + 120);
 
             // Draw the location text
-            g2d.setFont(locationFont);
-            g2d.drawString(location, x + 200, y + 65);
-            g2d.dispose();
+            graphics.setFont(locationFont);
+            graphics.drawString(location, x + 200, y + 65);
+            graphics.dispose();
 
             // Save the changes to the file
             File outputfile = new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\" + participant + ".png");
             ImageIO.write(participantFile, "png", outputfile);
-            System.out.println("doing participant " + participant);
+            // System.out.println("participant: " + participant);
         } 
-        catch (IOException e) {
-            e.printStackTrace();
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
         }
     }
 
+    /*
+     * This function retrieves location data from a certain participant's text file
+     */
     public static String getLocationData(File file, int index) {
         String locationData = "";
         BufferedReader reader;
 
+        // Read the file line-by-line until the intended data is found
         try {
             reader = new BufferedReader(new FileReader(file));
             String line = reader.readLine();
