@@ -1,0 +1,30 @@
+kitchen
+staircase
+garage
+park
+staircase
+kitchen
+living room
+kitchen
+UNCLEAR
+bedroom
+bedroom 
+dining room
+kitchen
+kitchen
+dining room
+park
+kitchen
+living room
+kitchen
+dining room
+living room
+bedroom
+kitchen
+bedroom
+balcony
+living room
+frontyard
+kitchen
+balcony
+dining room

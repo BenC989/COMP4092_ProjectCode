@@ -1,0 +1,33 @@
+car
+street
+medical centre
+medical centre
+shop
+shop
+street
+car
+backyard
+dining room
+side of house
+office
+office
+kitchen
+office
+back room
+office
+office
+office
+office
+office
+kitchen
+UNCLEAR
+backyard
+kitchen
+side of house
+kitchen
+backyard
+kitchen
+backyard
+kitchen
+spare room
+dining room

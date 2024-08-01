@@ -7,6 +7,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public class Main {
 
@@ -54,7 +56,7 @@ public class Main {
          * 5. Repeat for all participants
          */ 
         int numberOfParticipants = Integer.valueOf(imageTableRecords.get(imageTableRecords.size()-1).participantID);
-        for (int i = 15; i <= numberOfParticipants; i++) {
+        for (int i = 1; i <= numberOfParticipants; i++) {
             String ID = "";
             if (i < 10) {
                 ID = "0";
@@ -236,7 +238,9 @@ public class Main {
         boolean foundParticipant = (tableRecords.get(index).participantID.equals(participant));
         boolean nextActivitySame = (tableRecords.get(index).activity).equals(tableRecords.get(index + 1).activity);
         boolean nextParticipantSame = (tableRecords.get(index+1).participantID).equals(participant);
+        int locationIndex = -1;
         int representativeImageIndex = 1;
+        File representativeImage = null;
         boolean foundBetterImage = false;
 
         // Search the list of Image records until the correct participant is found
@@ -265,6 +269,7 @@ public class Main {
 
             // When there is a new activity, record start date/time
             if (newActivity == true) {
+                locationIndex++;
                 representativeImageIndex = 1;
                 activity.participant = participant;
                 activity.name = tableRecords.get(index).activity;
@@ -288,6 +293,7 @@ public class Main {
                     if (tableRecords.get(index).fileName.equals(preselectedRepresenativeImages.get(i))) {
                         foundBetterImage = true;
                         activity.representative = tableRecords.get(index).fileName;
+                        representativeImage = tableRecords.get(index).file;
                     }
                 }
             }
@@ -301,6 +307,7 @@ public class Main {
                  */
                 if (foundBetterImage == false) {
                     activity.representative = tableRecords.get(index - (representativeImageIndex / 2)).fileName;
+                    representativeImage = tableRecords.get(index - (representativeImageIndex / 2)).file;
                 }
 
                 // Record the end date and time
@@ -360,11 +367,12 @@ public class Main {
 
                 // Add this record to the participant's data visualisation file
                 try {
+                    String locationData = getLocationData(new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\LocationData\\" + participant + ".txt"), locationIndex);
                     BufferedImage participantFile = ImageIO.read(new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\" + participant + ".png"));
-                    BufferedImage representativeImage = ImageIO.read(tableRecords.get(index - (representativeImageIndex / 2)).file);
+                    BufferedImage repImage = ImageIO.read(representativeImage);
                     String startTime = activity.startDay + "/" + activity.startMonth + "/" + activity.startYear + ", " + activity.startHour + ":" + activity.startMinute + ":" + activity.startSecond;
                     String endTime = activity.endDay + "/" + activity.endMonth + "/" + activity.endYear + ", " + activity.endHour + ":" + activity.endMinute + ":" + activity.endSecond;
-                    addVisualisationEntry(participantFile, representativeImage, startTime, endTime, participant);
+                    addVisualisationEntry(participantFile, repImage, startTime, endTime, locationData, participant);
                 }
                 catch (Exception e) {}
 
@@ -838,7 +846,11 @@ public class Main {
         }
     }
 
-    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage overlayImage, String startTime, String endTime, String participant) {
+    public static void writeActivityTableLocation(Writer writer, ActivityRecord activity) {
+        
+    }
+
+    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage overlayImage, String startTime, String endTime, String location, String participant) {
         try {
             Graphics2D g2d = participantFile.createGraphics();
 
@@ -851,7 +863,16 @@ public class Main {
             g2d.drawString("Participant " + participant, 140, 30);
             
             // Calculate and define size and position for overlay image
-            double scale = 0.3; 
+            double scale; // 15 16 17 19
+            if (participant.equals("15")
+             || participant.equals("16")
+             || participant.equals("17")
+             || participant.equals("19")) { 
+                scale = 0.15; 
+            }
+            else {
+                scale = 0.3; 
+            }
             int overlayWidth = (int) (overlayImage.getWidth() * scale);
             int overlayHeight = (int) (overlayImage.getHeight() * scale);
             int x = 110; 
@@ -868,7 +889,7 @@ public class Main {
 
             // Draw the location text
             g2d.setFont(locationFont);
-            g2d.drawString("LOCATION", x + 200, y + 65);
+            g2d.drawString(location, x + 200, y + 65);
             g2d.dispose();
 
             // Save the changes to the file
@@ -879,5 +900,22 @@ public class Main {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getLocationData(File file, int index) {
+        String locationData = "";
+        BufferedReader reader;
+
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line = reader.readLine();
+            for (int i = 0; i < index; i++) {
+                line = reader.readLine();
+            }
+            locationData = line;
+        }
+        catch (Exception e) {}
+
+        return locationData;
     }
 }
