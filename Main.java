@@ -363,16 +363,16 @@ public class Main {
                 }
 
                 // Add this record to the participant's activity list
+                activity.location = getLocationData(new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\LocationData\\" + participant + ".txt"), locationIndex);
                 activityTableRecords.add(activity);
 
                 // Add this record to the participant's data visualisation file
                 try {
-                    String locationData = getLocationData(new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\LocationData\\" + participant + ".txt"), locationIndex);
                     BufferedImage participantFile = ImageIO.read(new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\" + participant + ".png"));
                     BufferedImage repImage = ImageIO.read(representativeImage);
                     String startTime = activity.startDay + "/" + activity.startMonth + "/" + activity.startYear + ", " + activity.startHour + ":" + activity.startMinute + ":" + activity.startSecond;
                     String endTime = activity.endDay + "/" + activity.endMonth + "/" + activity.endYear + ", " + activity.endHour + ":" + activity.endMinute + ":" + activity.endSecond;
-                    addVisualisationEntry(participantFile, repImage, startTime, endTime, locationData, participant);
+                    addVisualisationEntry(participantFile, repImage, startTime, endTime, activity.location, participant);
                 }
                 catch (Exception e) {}
 
@@ -449,13 +449,13 @@ public class Main {
             // Write the Activity Table headings
             writer.write("|----------------|-------------------|---------------------|");
             writer.write("---------------------|------------|-----------------------------------|");
-            writer.write("--------------|");
+            writer.write("-------------------|");
             writer.write("\n");
-            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |   Representative Image File Name  |   Location   |");
+            writer.write("| Participant ID |  Activity Class   |  Start Date / Time  |   End Date / Time   |  Duration  |   Representative Image File Name  |      Location     |");
             writer.write("\n");
             writer.write("|----------------|-------------------|---------------------|");
             writer.write("---------------------|------------|-----------------------------------|");
-            writer.write("--------------|");
+            writer.write("-------------------|");
             writer.write("\n");
 
             // Write the Activity Table records
@@ -466,12 +466,13 @@ public class Main {
                 writeActivityTableEndDT(writer, i);
                 writeActivityTableDuration(writer, i);
                 writeActivityTableRepresentative(writer, i);
+                writeActivityTableLocation(writer, i);
             }
 
             // Complete the table
             writer.write("|----------------|-------------------|---------------------|");
             writer.write("---------------------|------------|-----------------------------------|");
-            writer.write("--------------|");
+            writer.write("-------------------|");
             writer.write("\n");
         }
         catch (Exception e) {
@@ -839,7 +840,7 @@ public class Main {
      */
     public static void writeActivityTableRepresentative(Writer writer, ActivityRecord activity) {
         try {
-            writer.write(activity.representative + "|\n");
+            writer.write(activity.representative + "|");
         }
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 
@@ -847,7 +848,19 @@ public class Main {
     }
 
     public static void writeActivityTableLocation(Writer writer, ActivityRecord activity) {
-        
+        try {
+            if (activity.location == null) {
+                activity.location = "";
+            }
+            writer.write(activity.location);
+            for (int l = (19-(19-(activity.location.length()))); l < 19; l++) {
+                writer.write(" ");
+            }
+            writer.write("|\n");
+        }
+        catch (Exception e) {
+            System.err.println("Error! " + e.getMessage()); 
+        }
     }
 
     public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage overlayImage, String startTime, String endTime, String location, String participant) {
@@ -863,7 +876,7 @@ public class Main {
             g2d.drawString("Participant " + participant, 140, 30);
             
             // Calculate and define size and position for overlay image
-            double scale; // 15 16 17 19
+            double scale;
             if (participant.equals("15")
              || participant.equals("16")
              || participant.equals("17")
