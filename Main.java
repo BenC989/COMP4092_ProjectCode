@@ -375,7 +375,7 @@ public class Main {
                     BufferedImage repImage = ImageIO.read(representativeImage);
                     String startTime = activity.startDay + "/" + activity.startMonth + "/" + activity.startYear + ", " + activity.startHour + ":" + activity.startMinute + ":" + activity.startSecond;
                     String endTime = activity.endDay + "/" + activity.endMonth + "/" + activity.endYear + ", " + activity.endHour + ":" + activity.endMinute + ":" + activity.endSecond;
-                    addVisualisationEntry(participantFile, repImage, startTime, endTime, activity.location, participant);
+                    addVisualisationEntry(participantFile, repImage, startTime, endTime, activity.location, activity.name, participant);
                 }
                 catch (Exception e) {}
 
@@ -873,14 +873,14 @@ public class Main {
      * This function visualises participant activity data, printing text and a representative
      * image onto a png file to show the time and location of a participant's activities
      */
-    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage repImage, String startTime, String endTime, String location, String participant) {
+    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage repImage, String startTime, String endTime, String location, String activityName, String participant) {
         try {
             Graphics2D graphics = participantFile.createGraphics();
 
             // Define font and draw heading participant text
             Font headingFont = new Font("Arial", Font.BOLD, 20);
             Font timeFont = new Font("Arial", Font.BOLD, 10); 
-            Font locationFont = new Font("Arial", Font.BOLD, 10);
+            Font locationFont = new Font("Arial", Font.BOLD, 9);
             graphics.setFont(headingFont);
             graphics.setColor(Color.BLACK); 
             graphics.drawString("Participant " + participant, 140, 30);
@@ -907,12 +907,17 @@ public class Main {
 
             // Draw the date and time text
             graphics.setFont(timeFont);
-            graphics.drawString(startTime, x - 105, y);
-            graphics.drawString(endTime, x - 105, y + 120);
+            graphics.drawString("TIME:    " + startTime.substring(12,20), x - 106, y - 5);
+            graphics.drawString("TIME:    " + endTime.substring(12,20), x - 106, y + 115);
+            graphics.drawString("DATE:   " + startTime.substring(0,10), x - 105, y + 5);
+            graphics.drawString("DATE:   " + endTime.substring(0,10), x - 105, y + 125);
 
-            // Draw the location text
+            // Draw the location and activity text
             graphics.setFont(locationFont);
-            graphics.drawString(location, x + 200, y + 65);
+            graphics.drawString("LOCATION", x + 199, y + 35);
+            graphics.drawString(location, x + 200, y + 45);
+            graphics.drawString("ACTIVITY", x + 200, y + 75);
+            graphics.drawString(activityName, x + 199, y + 85);
             graphics.dispose();
 
             // Save the changes to the file
