@@ -55,7 +55,7 @@ public class Main {
          * 5. Repeat for all participants
          */ 
         int numberOfParticipants = Integer.valueOf(imageTableRecords.get(imageTableRecords.size()-1).participantID);
-        for (int i = 1; i <= numberOfParticipants; i++) {
+        for (int i = 1; i <= 1; i++) {
             String ID = "";
             if (i < 10) {
                 ID = "0";
@@ -354,6 +354,21 @@ public class Main {
                 activity.durationHours = String.valueOf(hours);
                 activity.durationMinutes = String.valueOf(minutes);
                 activity.durationSeconds = String.valueOf(seconds);
+                activity.duration = "";
+                if (Integer.valueOf(activity.durationHours) < 10) {
+                    activity.duration += 0;
+                }
+                activity.duration += activity.durationHours;
+                activity.duration += ":";
+                if (Integer.valueOf(activity.durationMinutes) < 10) {
+                    activity.duration += 0;
+                }
+                activity.duration += activity.durationMinutes;
+                activity.duration += ":";
+                if (Integer.valueOf(activity.durationSeconds) < 10) {
+                    activity.duration += 0;
+                }
+                activity.duration += activity.durationSeconds;
 
                 // Re-correct the activity end hour
                 if (Integer.valueOf(activity.endDay) > Integer.valueOf(activity.startDay)) {
@@ -375,7 +390,7 @@ public class Main {
                     BufferedImage repImage = ImageIO.read(representativeImage);
                     String startTime = activity.startDay + "/" + activity.startMonth + "/" + activity.startYear + ", " + activity.startHour + ":" + activity.startMinute + ":" + activity.startSecond;
                     String endTime = activity.endDay + "/" + activity.endMonth + "/" + activity.endYear + ", " + activity.endHour + ":" + activity.endMinute + ":" + activity.endSecond;
-                    addVisualisationEntry(participantFile, repImage, startTime, endTime, activity.location, activity.name, participant);
+                    addVisualisationEntry(participantFile, repImage, startTime, endTime, activity.location, activity.name, participant, activity.duration);
                 }
                 catch (Exception e) {}
 
@@ -873,7 +888,7 @@ public class Main {
      * This function visualises participant activity data, printing text and a representative
      * image onto a png file to show the time and location of a participant's activities
      */
-    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage repImage, String startTime, String endTime, String location, String activityName, String participant) {
+    public static void addVisualisationEntry(BufferedImage participantFile, BufferedImage repImage, String startTime, String endTime, String location, String activityName, String participant, String duration) {
         try {
             Graphics2D graphics = participantFile.createGraphics();
 
@@ -881,6 +896,7 @@ public class Main {
             Font headingFont = new Font("Arial", Font.BOLD, 20);
             Font timeFont = new Font("Arial", Font.BOLD, 10); 
             Font locationFont = new Font("Arial", Font.BOLD, 9);
+            Font lineFont = new Font("Arial", Font.BOLD, 90);
             graphics.setFont(headingFont);
             graphics.setColor(Color.BLACK); 
             graphics.drawString("Participant " + participant, 140, 30);
@@ -909,8 +925,16 @@ public class Main {
             graphics.setFont(timeFont);
             graphics.drawString("TIME:    " + startTime.substring(12,20), x - 106, y - 5);
             graphics.drawString("TIME:    " + endTime.substring(12,20), x - 106, y + 115);
-            graphics.drawString("DATE:   " + startTime.substring(0,10), x - 105, y + 5);
-            graphics.drawString("DATE:   " + endTime.substring(0,10), x - 105, y + 125);
+            graphics.drawString("DATE:   " + startTime.substring(0,10), x - 106, y + 5);
+            graphics.drawString("DATE:   " + endTime.substring(0,10), x - 106, y + 125);
+
+            // Draw the duration
+            graphics.setFont(lineFont);
+            graphics.drawString("|", x - 65, y + 80);
+            graphics.setFont(timeFont);
+            graphics.rotate(Math.toRadians(270), x - 65, y + 80);
+            graphics.drawString(duration, x - 65, y + 80);
+            graphics.rotate(Math.toRadians(-270), x - 65, y + 80); 
 
             // Draw the location and activity text
             graphics.setFont(locationFont);
@@ -923,7 +947,7 @@ public class Main {
             // Save the changes to the file
             File outputfile = new File("C:\\Users\\benca\\Documents\\COMP4092_ProjectCode\\DataVisualisation\\" + participant + ".png");
             ImageIO.write(participantFile, "png", outputfile);
-            // System.out.println("participant: " + participant);
+           
         } 
         catch (Exception e) {
             System.err.println("Error! " + e.getMessage()); 

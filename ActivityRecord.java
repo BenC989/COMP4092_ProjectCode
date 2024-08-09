@@ -18,6 +18,7 @@ public class ActivityRecord {
     String endMinute;
     String endSecond;
 
+    String duration;
     String durationHours;
     String durationMinutes;
     String durationSeconds;
